@@ -123,10 +123,13 @@ def head(title, desc, canonical, schema_extra="", og_type="website"):
 <meta property="og:image" content="@@SITE@@/assets/img/og-cover.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="Instituto Correr, Blumenau/SC. Volte a fazer o que quiser, sem se preocupar com a dor.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="@@TITLE@@">
 <meta name="twitter:description" content="@@DESC@@">
 <meta name="twitter:image" content="@@SITE@@/assets/img/og-cover.jpg">
+<meta name="twitter:image:alt" content="Instituto Correr, Blumenau/SC. Volte a fazer o que quiser, sem se preocupar com a dor.">
 
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/logo.webp">

@@ -119,6 +119,14 @@ strong { color: var(--ink); font-weight: 620; }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+/* Proporcoes alternativas do split. Existem como classe, e nao como style
+   inline, porque style inline vence media query e o bloco ficaria em duas
+   colunas no celular. */
+.split--faq { grid-template-columns: .85fr 1.15fr; align-items: start; }
+.split--form { grid-template-columns: 1fr 1.05fr; }
+.split--top { align-items: start; }
+.split > * { min-width: 0; }
+.sticky-col { position: sticky; top: calc(var(--nav-h) + 2rem); }
 
 /* ---------- 5. Utilitários ---------- */
 .center { text-align: center; }
@@ -159,7 +167,12 @@ strong { color: var(--ink); font-weight: 620; }
   font-family: var(--font-sans); font-size: .93rem; font-weight: 600; letter-spacing: .005em;
   padding: .95rem 1.75rem; border-radius: var(--r-full);
   transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .2s, color .2s, border-color .2s;
-  white-space: nowrap; cursor: pointer; border: 1.5px solid transparent;
+  cursor: pointer; border: 1.5px solid transparent;
+  /* Rotulo pode quebrar. Com nowrap, um texto longo como "Tirar duvida
+     sobre o meu caso" define um min-content maior que a coluna e empurra
+     a pagina inteira para fora da tela em telas de 320px. */
+  white-space: normal; text-align: center; text-wrap: balance;
+  min-width: 0; max-width: 100%;
 }
 .btn svg { width: 18px; height: 18px; flex: none; }
 .btn:hover { transform: translateY(-2px); }
@@ -179,7 +192,10 @@ strong { color: var(--ink); font-weight: 620; }
 
 .btn--sm { padding: .68rem 1.3rem; font-size: .87rem; }
 .btn--lg { padding: 1.12rem 2.2rem; font-size: 1rem; }
-.btn-row { display: flex; flex-wrap: wrap; gap: .85rem; }
+/* O CTA do header vive numa barra de altura fixa e nao pode quebrar. */
+.header__cta { white-space: nowrap; }
+.btn-row { display: flex; flex-wrap: wrap; gap: .85rem; min-width: 0; }
+.btn-row > * { min-width: 0; }
 
 /* Link de texto com seta */
 .tlink {
@@ -278,7 +294,9 @@ body.no-scroll .header--overlay .burger span { background: var(--forest-700); }
   overflow-y: auto; display: none; flex-direction: column;
 }
 .mnav.is-open { display: flex; animation: fadeUp .3s var(--ease); }
-.mnav a, .mnav > button { display: block; width: 100%; text-align: left; padding: 1rem .25rem; border-bottom: 1px solid var(--line-soft); font-size: 1.08rem; font-weight: 500; color: var(--ink); font-family: var(--font-display); }
+/* O :not(.btn) importa: sem ele esta regra tem especificidade maior que
+   .btn--primary e pinta o texto do CTA de escuro sobre o verde. */
+.mnav a:not(.btn), .mnav > button { display: block; width: 100%; text-align: left; padding: 1rem .25rem; border-bottom: 1px solid var(--line-soft); font-size: 1.08rem; font-weight: 500; color: var(--ink); font-family: var(--font-display); }
 .mnav .sub { padding-left: 1rem; }
 .mnav .sub a { font-size: .97rem; font-weight: 400; color: var(--ink-mid); border-bottom-color: transparent; padding: .6rem .25rem; font-family: var(--font-sans); }
 .mnav .btn { display: flex; margin-top: 1.5rem; width: 100%; border-bottom: 0; }
@@ -477,14 +495,33 @@ body.no-scroll { overflow: hidden; }
 .section--dark .step { border-color: rgba(255,255,255,.14); }
 
 /* Equipe */
-.team-card { text-align: left; }
+.team-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--r-2xl);
+  padding: .8rem .8rem 1.5rem; text-align: center;
+  display: flex; flex-direction: column;
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s;
+}
+.team-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); border-color: var(--forest-200); }
 .team-card__img { position: relative; border-radius: var(--r-arch); overflow: hidden; background: var(--paper-2); aspect-ratio: 3/4; }
 .team-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
 .team-card:hover .team-card__img img { transform: scale(1.05); }
-.team-card h3 { margin-top: 1.2rem; font-size: 1.18rem; }
-.team-card .role { display: block; font-size: .84rem; font-weight: 600; color: var(--forest-600); margin-top: .3rem; }
-.team-card .reg { display: inline-block; margin-top: .55rem; font-size: .71rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); background: var(--white); border: 1px solid var(--line); padding: .28rem .7rem; border-radius: var(--r-full); }
-.team-card p { margin-top: .85rem; font-size: .92rem; }
+/* Gradiente na base da foto para o selo de registro nao brigar com o fundo */
+.team-card__img::after {
+  content: ""; position: absolute; inset: auto 0 0 0; height: 38%;
+  background: linear-gradient(to top, rgba(20,28,15,.55), rgba(20,28,15,0));
+}
+.team-card .reg {
+  position: absolute; z-index: 1; left: 50%; translate: -50% 0; bottom: .85rem;
+  max-width: calc(100% - 1.6rem);
+  background: rgba(255,255,255,.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: var(--forest-700); font-size: .66rem; font-weight: 650; letter-spacing: .1em;
+  text-transform: uppercase; line-height: 1.35;
+  padding: .34rem .85rem; border-radius: var(--r-full);
+}
+.team-card__body { padding: 1.2rem .5rem 0; }
+.team-card h3 { font-size: 1.12rem; }
+.team-card .role { display: block; font-size: .82rem; font-weight: 600; color: var(--forest-600); margin-top: .35rem; }
+.team-card p { margin-top: .9rem; font-size: .91rem; }
 
 /* Lista com check */
 .checks { display: grid; gap: .95rem; }
@@ -647,7 +684,9 @@ body.no-scroll { overflow: hidden; }
   :root { --nav-h: 74px; }
   .nav, .header__cta { display: none; }
   .burger { display: block; }
-  .split { grid-template-columns: 1fr; }
+  .split, .split--faq, .split--form { grid-template-columns: 1fr; }
+  /* Coluna fixada nao faz sentido empilhada. */
+  .sticky-col { position: static; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
   .stats { grid-template-columns: repeat(2, 1fr); row-gap: 2.5rem; }
@@ -669,7 +708,10 @@ body.no-scroll { overflow: hidden; }
   .wa-float { padding: 1rem; }
   .map-wrap iframe { height: 320px; }
   .btn { width: 100%; }
+  .btn--lg { padding: 1rem 1.35rem; font-size: .97rem; }
   .btn-row { flex-direction: column; }
+  /* E-mail e endereco sao as unicas cadeias longas sem espaco do site. */
+  .infocard a, .footer a { overflow-wrap: anywhere; }
   .hero__badge { max-width: none; }
   /* No celular a foto e panoramica num quadro alto: o recorte fica severo,
      entao a altura cede e o escurecimento passa a ser uniforme. */

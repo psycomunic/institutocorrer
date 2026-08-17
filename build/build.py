@@ -62,11 +62,16 @@ def cards_equipe(bio=True):
     out = ""
     for i, m in enumerate(TEAM):
         out += ('<article class="team-card reveal" data-d="' + str(i % 4) + '">'
-                '<div class="team-card__img"><img src="assets/img/' + m["img"] + '.webp" alt="' + m["nome"] + '" width="384" height="512" loading="lazy"></div>'
+                '<div class="team-card__img">'
+                '<img src="assets/img/' + m["img"] + '.webp" alt="' + m["nome"] + ', ' + m["role"]
+                + ' do Instituto Correr" width="384" height="538" loading="lazy">'
+                '<span class="reg">' + m["reg"] + '</span>'
+                '</div>'
+                '<div class="team-card__body">'
                 '<h3>' + m["nome"] + '</h3>'
                 '<span class="role">' + m["role"] + '</span>'
-                '<span class="reg">' + m["reg"] + '</span>'
                 + ('<p>' + m["bio"] + '</p>' if bio else '') +
+                '</div>'
                 '</article>')
     return out
 
@@ -209,7 +214,7 @@ def build_home():
 <section class="section">
   <div class="container">
     <div class="split" style="align-items:start">
-      <div style="position:sticky;top:calc(var(--nav-h) + 2rem)">
+      <div class="sticky-col">
         <span class="eyebrow reveal">Como funciona</span>
         <h2 class="reveal mt-5" data-d="1">Da primeira conversa até a alta</h2>
         <p class="lead reveal mt-5" data-d="2">Um caminho claro, com objetivos definidos em cada etapa. Você sempre sabe onde está e o que vem a seguir.</p>
@@ -286,8 +291,8 @@ def build_home():
 <!-- ===== FAQ ===== -->
 <section class="section">
   <div class="container">
-    <div class="split" style="align-items:start;grid-template-columns:.85fr 1.15fr">
-      <div style="position:sticky;top:calc(var(--nav-h) + 2rem)">
+    <div class="split split--faq">
+      <div class="sticky-col">
         <span class="eyebrow reveal">Dúvidas frequentes</span>
         <h2 class="reveal mt-5" data-d="1">Antes de agendar, talvez você queira saber</h2>
         <p class="reveal mt-5" data-d="2">Não encontrou sua dúvida? Fale com a gente pelo WhatsApp. Respondemos em horário comercial.</p>
@@ -487,7 +492,7 @@ def build_metodo():
 <section class="section section--soft">
   <div class="container">
     <div class="split" style="align-items:start">
-      <div style="position:sticky;top:calc(var(--nav-h) + 2rem)">
+      <div class="sticky-col">
         <span class="eyebrow reveal">A jornada</span>
         <h2 class="reveal mt-5" data-d="1">Cinco etapas, sem caixa-preta</h2>
         <p class="lead reveal mt-5" data-d="2">Você acompanha o raciocínio em cada passo. Nada é feito sem que você entenda por que está sendo feito.</p>
@@ -889,7 +894,7 @@ def build_contato():
 <main id="main">
 <section class="section">
   <div class="container">
-    <div class="split" style="grid-template-columns:1fr 1.05fr">
+    <div class="split split--form">
       <div>
         <span class="eyebrow reveal">Canais diretos</span>
         <h2 class="reveal mt-5" data-d="1">Onde nos encontrar</h2>
