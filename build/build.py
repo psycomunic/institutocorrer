@@ -964,7 +964,14 @@ def build_aux():
     sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
     write("sitemap.xml", sm)
-    write("robots.txt", "User-agent: *\nAllow: /\n\nSitemap: " + SITE + "/sitemap.xml\n")
+    # O deploy publica a raiz do repositorio (vercel.json -> outputDirectory "."),
+    # entao o gerador e os arquivos de apoio ficam alcancaveis pelo dominio.
+    # Nao ha segredo neles, mas tambem nao devem ser indexados.
+    robots = ["User-agent: *", "Allow: /"]
+    for p in ["/build/", "/tools/", "/AGENTS.md", "/COMECE-AQUI.md", "/LEIA-ME.md", "/package.json"]:
+        robots.append("Disallow: " + p)
+    robots += ["", "Sitemap: " + SITE + "/sitemap.xml", ""]
+    write("robots.txt", "\n".join(robots))
 
     fav = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
            '<rect width="100" height="100" rx="26" fill="#232F1B"/>'

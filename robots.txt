@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
 
 Sitemap: https://institutocorrer.com.br/sitemap.xml

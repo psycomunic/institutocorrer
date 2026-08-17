@@ -49,7 +49,16 @@ build/                  Gerador Python das páginas (opcional)
 ## Como publicar
 
 **Opção A, Vercel / Netlify (recomendado, grátis):**
-arraste a pasta para o painel, ou `vercel deploy`. Nada a configurar.
+arraste a pasta para o painel, ou conecte o repositório do GitHub.
+
+O `vercel.json` já resolve o único ponto de atenção: como existe um `package.json`
+com script `build`, a Vercel roda `npm run build` e depois procura a saída em `public/`.
+Como o gerador escreve na raiz, o arquivo declara `"outputDirectory": "."`.
+Sem isso o deploy falha com *No Output Directory named "public" found*.
+
+`cleanUrls` está desligado de propósito: os links internos, o `sitemap.xml` e as tags
+`canonical` usam `.html`. Ligar essa opção faria cada link interno passar por um
+redirect e brigaria com as canônicas.
 
 **Opção B, hospedagem tradicional:**
 suba tudo por FTP para a raiz (`public_html`). Configure o 404 apontando para `404.html`.
