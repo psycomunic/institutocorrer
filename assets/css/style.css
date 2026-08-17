@@ -494,34 +494,31 @@ body.no-scroll { overflow: hidden; }
 .step p { margin-top: .55rem; }
 .section--dark .step { border-color: rgba(255,255,255,.14); }
 
-/* Equipe */
-.team-card {
-  background: var(--white); border: 1px solid var(--line); border-radius: var(--r-2xl);
-  padding: .8rem .8rem 1.5rem; text-align: center;
-  display: flex; flex-direction: column;
-  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s;
+/* Equipe: nome e funcao vivem dentro da foto, entao o card e um objeto so.
+   Sem isso o texto fica solto embaixo da imagem e a versao sem bio, na home,
+   abre um vazio grande. */
+.team-card { display: flex; flex-direction: column; transition: transform .4s var(--ease); }
+.team-card:hover { transform: translateY(-6px); }
+.team-card__media {
+  position: relative; aspect-ratio: 3 / 4;
+  border-radius: var(--r-arch); overflow: hidden;
+  background: var(--paper-2); box-shadow: var(--sh-md);
 }
-.team-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); border-color: var(--forest-200); }
-.team-card__img { position: relative; border-radius: var(--r-arch); overflow: hidden; background: var(--paper-2); aspect-ratio: 3/4; }
-.team-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
-.team-card:hover .team-card__img img { transform: scale(1.05); }
-/* Gradiente na base da foto para o selo de registro nao brigar com o fundo */
-.team-card__img::after {
-  content: ""; position: absolute; inset: auto 0 0 0; height: 38%;
-  background: linear-gradient(to top, rgba(20,28,15,.55), rgba(20,28,15,0));
+.team-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+.team-card:hover .team-card__media img { transform: scale(1.05); }
+/* Escurecimento so na base, o suficiente para o texto ter contraste sem
+   apagar o rosto. */
+.team-card__media::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top,
+    rgba(18,26,14,.94) 0%, rgba(18,26,14,.78) 18%,
+    rgba(18,26,14,.34) 40%, rgba(18,26,14,0) 62%);
 }
-.team-card .reg {
-  position: absolute; z-index: 1; left: 50%; translate: -50% 0; bottom: .85rem;
-  max-width: calc(100% - 1.6rem);
-  background: rgba(255,255,255,.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  color: var(--forest-700); font-size: .66rem; font-weight: 650; letter-spacing: .1em;
-  text-transform: uppercase; line-height: 1.35;
-  padding: .34rem .85rem; border-radius: var(--r-full);
-}
-.team-card__body { padding: 1.2rem .5rem 0; }
-.team-card h3 { font-size: 1.12rem; }
-.team-card .role { display: block; font-size: .82rem; font-weight: 600; color: var(--forest-600); margin-top: .35rem; }
-.team-card p { margin-top: .9rem; font-size: .91rem; }
+.team-card__over { position: absolute; z-index: 1; inset: auto 0 0 0; padding: 1.1rem 1.15rem 1.15rem; }
+.team-card__over h3 { color: #fff; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.22; }
+.team-card__over .role { display: block; color: var(--forest-200); font-size: .8rem; font-weight: 600; line-height: 1.35; margin-top: .32rem; }
+.team-card__over .reg { display: block; color: rgba(255,255,255,.66); font-size: .71rem; letter-spacing: .05em; margin-top: .3rem; }
+.team-card__bio { padding: 1.1rem .15rem 0; font-size: .91rem; }
 
 /* Lista com check */
 .checks { display: grid; gap: .95rem; }

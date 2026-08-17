@@ -54,24 +54,26 @@ TEAM = [
          bio="Formada desde 2012, atua com o Método Busquet, treinamento funcional e pilates. Trabalha a integração entre corpo e mente em cada plano de tratamento."),
     dict(img="ketlin", nome="Ketlin Cardoso", role="Financeiro e Agendamentos", reg="Experiência em estética",
          bio="Cuida da agenda, do financeiro e da experiência de quem chega ao Instituto, do primeiro contato ao acompanhamento do plano."),
-    dict(img="terezinha", nome="Terezinha", role="Recepção", reg="Atendimento",
+    # reg vazio de proposito: "Atendimento" era a funcao dita de novo.
+    dict(img="terezinha", nome="Terezinha", role="Recepção", reg="",
          bio="O primeiro rosto de quem chega pela manhã. Recebe cada paciente pelo nome e mantém o clima leve que define a casa."),
 ]
 
 def cards_equipe(bio=True):
     out = ""
     for i, m in enumerate(TEAM):
+        reg = m["reg"].strip()   # opcional: so sai quando acrescenta informacao
         out += ('<article class="team-card reveal" data-d="' + str(i % 4) + '">'
-                '<div class="team-card__img">'
+                '<div class="team-card__media">'
                 '<img src="assets/img/' + m["img"] + '.webp" alt="' + m["nome"] + ', ' + m["role"]
                 + ' do Instituto Correr" width="384" height="538" loading="lazy">'
-                '<span class="reg">' + m["reg"] + '</span>'
-                '</div>'
-                '<div class="team-card__body">'
+                '<div class="team-card__over">'
                 '<h3>' + m["nome"] + '</h3>'
                 '<span class="role">' + m["role"] + '</span>'
-                + ('<p>' + m["bio"] + '</p>' if bio else '') +
+                + ('<span class="reg">' + reg + '</span>' if reg else '') +
                 '</div>'
+                '</div>'
+                + ('<p class="team-card__bio">' + m["bio"] + '</p>' if bio else '') +
                 '</article>')
     return out
 
