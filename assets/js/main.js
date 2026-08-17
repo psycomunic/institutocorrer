@@ -124,6 +124,22 @@
     counters.forEach(function (el) { cio.observe(el); });
   }
 
+  /* Vídeo: o iframe do YouTube só nasce no clique.
+     Antes disso a página não fala com o YouTube nem carrega os cookies dele. */
+  document.querySelectorAll('[data-video]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + btn.dataset.video +
+              '?autoplay=1&rel=0&modestbranding=1';
+      f.title = btn.dataset.title || 'Vídeo';
+      f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';
+      f.setAttribute('allowfullscreen', '');
+      f.setAttribute('loading', 'lazy');
+      btn.replaceWith(f);
+      f.focus();
+    });
+  });
+
   /* Form → WhatsApp */
   var form = document.querySelector('[data-wa-form]');
   if (form) {

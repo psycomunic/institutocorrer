@@ -60,7 +60,34 @@ IC = {
 "file": _svg('<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13h4"/><path d="M10 17h4"/>'),
 "repeat": _svg('<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>'),
 "zap": _svg('<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>'),
+"play": _svg('<path d="M6.5 4.6a1 1 0 0 1 1.52-.85l10.1 6.4a1 1 0 0 1 0 1.7l-10.1 6.4a1 1 0 0 1-1.52-.85Z"/>', fill=True),
 }
+
+
+# --------------------------------------------------------------------------
+# VÍDEO
+# --------------------------------------------------------------------------
+# O iframe do YouTube só é criado quando a pessoa clica no play. Até lá a
+# página mostra um poster local, sem nenhuma requisição a terceiros e sem
+# os cookies que o embed padrão instala em quem apenas passa pela página.
+VIDEO_METODO = dict(
+    id="Ld49dnbaHvk",
+    poster="video-metodo.webp",
+    poster_w=1280, poster_h=720,
+    label="Assistir ao vídeo institucional do Instituto Correr",
+)
+
+
+def video(v=VIDEO_METODO):
+    if not v.get("id"):
+        return ""
+    return ('<div class="video reveal">'
+            '<button class="video__btn" type="button" data-video="' + v["id"] + '" '
+            'data-title="' + v["label"] + '" aria-label="' + v["label"] + '">'
+            '<img src="assets/img/' + v["poster"] + '" alt="" width="' + str(v["poster_w"])
+            + '" height="' + str(v["poster_h"]) + '" loading="lazy">'
+            '<span class="video__play" aria-hidden="true">' + IC["play"] + '</span>'
+            '</button></div>')
 
 # --------------------------------------------------------------------------
 # TRATAMENTOS

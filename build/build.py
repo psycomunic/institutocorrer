@@ -213,7 +213,7 @@ def build_home():
 <!-- ===== JORNADA ===== -->
 <section class="section">
   <div class="container">
-    <div class="split" style="align-items:start">
+    <div class="split split--top">
       <div class="sticky-col">
         <span class="eyebrow reveal">Como funciona</span>
         <h2 class="reveal mt-5" data-d="1">Da primeira conversa até a alta</h2>
@@ -349,6 +349,7 @@ def _fill(h, tcards="", team="", faq="", svc=""):
         "@@HOURS@@": HOURS, "@@STREET@@": STREET, "@@CITY@@": CITY,
         "@@STATE@@": STATE, "@@CEP@@": CEP,
         "@@TCARDS@@": tcards, "@@TEAM@@": team, "@@FAQ@@": faq, "@@SVC@@": svc,
+        "@@VIDEO@@": video(),
     }
     for k, v in reps.items():
         h = h.replace(k, v)
@@ -489,9 +490,20 @@ def build_metodo():
   </div>
 </section>
 
+<section class="section section--sand">
+  <div class="container container--narrow">
+    <div class="sec-head sec-head--center">
+      <span class="eyebrow eyebrow--center reveal">Em vídeo</span>
+      <h2 class="reveal" data-d="1">Conheça o Instituto por dentro</h2>
+      <p class="reveal" data-d="2">Uma volta pela estrutura e pelo clima do atendimento em Blumenau.</p>
+    </div>
+    <div class="mt-8">@@VIDEO@@</div>
+  </div>
+</section>
+
 <section class="section section--soft">
   <div class="container">
-    <div class="split" style="align-items:start">
+    <div class="split split--top">
       <div class="sticky-col">
         <span class="eyebrow reveal">A jornada</span>
         <h2 class="reveal mt-5" data-d="1">Cinco etapas, sem caixa-preta</h2>
