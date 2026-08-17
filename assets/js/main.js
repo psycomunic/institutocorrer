@@ -1,4 +1,4 @@
-/* Instituto Correr — interações */
+/* Instituto Correr: interações */
 (function () {
   'use strict';
 
@@ -43,7 +43,7 @@
     });
   }
 
-  /* Desktop dropdown — keyboard + click support */
+  /* Desktop dropdown: keyboard + click support */
   document.querySelectorAll('.has-drop').forEach(function (dd) {
     var btn = dd.querySelector('button');
     if (!btn) return;
@@ -135,7 +135,7 @@
         'Nome: ' + (f.get('nome') || '') + '\n' +
         'Telefone: ' + (f.get('telefone') || '') + '\n' +
         'Serviço de interesse: ' + (f.get('servico') || '') + '\n' +
-        'Queixa principal: ' + (f.get('mensagem') || '—');
+        'Queixa principal: ' + (f.get('mensagem') || 'não informado');
       var num = form.dataset.waForm;
       window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
     });

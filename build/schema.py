@@ -13,7 +13,7 @@ ORG = {
     "@type": ["MedicalClinic", "Physiotherapy", "LocalBusiness"],
     "@id": SITE + "/#clinica",
     "name": NAME,
-    "alternateName": "Instituto Correr — Fisioterapia e Quiropraxia Blumenau",
+    "alternateName": "Instituto Correr Fisioterapia e Quiropraxia Blumenau",
     "url": SITE + "/",
     "logo": SITE + "/assets/img/logo.webp",
     "image": SITE + "/assets/img/og-cover.jpg",
@@ -78,7 +78,7 @@ WEBSITE = {
 
 
 def breadcrumb(items):
-    """items = [(name, url_or_None), ...] — url relativo ou None p/ atual"""
+    """items = [(name, url_or_None), ...] com url relativo ou None p/ atual"""
     els = [{"@type": "ListItem", "position": 1, "name": "Início", "item": SITE + "/"}]
     for i, (name, url) in enumerate(items, start=2):
         el = {"@type": "ListItem", "position": i, "name": name}

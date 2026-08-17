@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Verificação rápida do site — sem dependências.
+ * Verificação rápida do site, sem dependências.
  *   node tools/check.mjs
  *
  * Checa: links internos quebrados, imagens faltando, alt ausente,
@@ -99,12 +99,12 @@ let total = 0;
 for (const f of walk(join(ROOT, 'assets'))) {
   const kb = statSync(f).size / 1024;
   total += kb;
-  if (kb > 300) W('assets', `${f.replace(ROOT + '/', '')} tem ${kb.toFixed(0)} KB — considere otimizar`);
+  if (kb > 300) W('assets', `${f.replace(ROOT + '/', '')} tem ${kb.toFixed(0)} KB, considere otimizar`);
 }
 
 // relatório
 const line = '─'.repeat(58);
-console.log(`\n${line}\nInstituto Correr — verificação\n${line}`);
+console.log(`\n${line}\nInstituto Correr: verificação\n${line}`);
 console.log(`Páginas analisadas: ${pages.length}`);
 console.log(`Peso total de assets: ${(total / 1024).toFixed(2)} MB`);
 

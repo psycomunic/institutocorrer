@@ -1,19 +1,19 @@
-# Instituto Correr — contexto do projeto
+# Instituto Correr: contexto do projeto
 
 > Arquivo de contexto para agentes de IA (Antigravity, Claude Code, Cursor, Copilot).
 > Leia isto antes de qualquer alteração.
 
 ## O que é
 
-Site institucional do **Instituto Correr** — clínica de fisioterapia, quiropraxia, pilates,
+Site institucional do **Instituto Correr**, clínica de fisioterapia, quiropraxia, pilates,
 liberação miofascial e terapias manuais em **Blumenau/SC**.
 Substitui o site WordPress antigo (`institutocorrer.com.br`).
 
 **Objetivos de negócio, em ordem:**
 
-1. Conversão — agendamento pelo WhatsApp
-2. SEO local — ranquear para "fisioterapia Blumenau", "quiropraxia Blumenau", "pilates Blumenau"
-3. Autoridade — método, equipe, CREFITO, base científica
+1. Conversão: agendamento pelo WhatsApp
+2. SEO local: ranquear para "fisioterapia Blumenau", "quiropraxia Blumenau", "pilates Blumenau"
+3. Autoridade: método, equipe, CREFITO, base científica
 
 ## Stack
 
@@ -24,10 +24,10 @@ Sass ou qualquer build step sem que o usuário peça explicitamente.
 
 - CSS: um arquivo, `assets/css/style.css`, com design tokens em `:root`
 - JS: um arquivo, `assets/js/main.js`, vanilla, sem dependências
-- Fontes: Google Fonts (Fraunces + Inter) via `<link>`
+- Fontes: Google Fonts (Outfit + Inter) via `<link>`
 - Imagens: WebP, com `width`/`height` declarados e `loading="lazy"` fora do hero
 
-## ⚠️ As páginas são GERADAS — não edite os `.html` às cegas
+## ⚠️ As páginas são GERADAS. Não edite os `.html` às cegas
 
 Os 12 arquivos `.html` da raiz são **saída** do gerador em `build/`.
 Editar um `.html` direto funciona, mas a alteração é **perdida** na próxima vez que
@@ -46,7 +46,7 @@ alguém rodar `npm run build`.
 Depois de mexer em qualquer coisa dentro de `build/`, rode:
 
 ```bash
-npm run build      # equivale a: cd build && python3 build.py
+npm run build      # equivale a: cd build && python3 build.py || python build.py
 ```
 
 Se você **só** vai mexer em CSS/JS/imagens, não precisa rodar o build.
@@ -69,7 +69,7 @@ Se você **só** vai mexer em CSS/JS/imagens, não precisa rodar o build.
 ├── 404.html
 ├── sitemap.xml  robots.txt
 ├── assets/
-│   ├── css/style.css             Design system completo (~700 linhas)
+│   ├── css/style.css             Design system completo (~640 linhas)
 │   ├── js/main.js                Interações
 │   └── img/                      Logos, fotos da equipe, hero, og-cover, favicon
 └── build/
@@ -86,8 +86,8 @@ Tudo em `build/partials.py`, no topo do arquivo:
 PHONE_DISPLAY = "(47) 3222-3565"
 WA            = "554732223565"     # número do link wa.me
 EMAIL         = "contato@institutocorrer.com.br"
-STREET        = "Rua Frederico Busch Júnior, 101 — Ed. Oswaldo Cruz"
-HOURS         = "Seg. a Sex., 7h–12h e 13h–20h"
+STREET        = "Rua Frederico Busch Júnior, 101, Ed. Oswaldo Cruz"
+HOURS         = "Seg. a sex., das 7h às 12h e das 13h às 20h"
 TREATMENTS    = [...]              # 5 tratamentos: slug, nome, ícone, resumo, bullets
 ```
 
@@ -99,19 +99,37 @@ Conteúdo das páginas de tratamento fica em `build/build.py` → dict `TDATA`.
 
 ## Design tokens
 
-Em `assets/css/style.css`, bloco `:root`. Paleta extraída do próprio logo:
+Em `assets/css/style.css`, bloco `:root`. Paleta verde profundo sobre off-white:
 
-- `--navy-800: #1C1F2B` — texto e seções escuras
-- `--gold-500: #E5B31D` — cor de ação (CTA, destaques, eyebrows)
-- `--bg-soft: #F8F9FB` / `--bg-mute: #F1F3F7` — alternância entre seções
-- Display: `Fraunces` (serifada) · Corpo/UI: `Inter`
+- `--forest-800: #232F1B` para seções escuras, `--forest-900: #1B2415` para o rodapé
+- `--forest-500: #4C6438` é a cor de ação (CTA, ícones, eyebrows, foco)
+- `--paper: #EFF1EA` é o fundo padrão da página; `--white` e `--sand-100: #F4EDDD`
+  alternam entre seções (`.section--soft`, `.section--sand`, `.section--mute`)
+- `--ink: #1F2A18` para títulos, `--ink-mid` para corpo, `--ink-dim` para apoio
+- Display: `Outfit` (geométrica, peso 500) · Corpo/UI: `Inter`
 
 Não invente cores novas fora dos tokens. Se precisar de um tom novo, adicione ao `:root`.
+
+### Formas
+
+A linguagem visual é de cantos generosos e arcos:
+
+- `--r-arch` é o arco usado em foto de hero e nos cards de equipe. A curva do topo é
+  rasa (26%) de propósito: as fotos disponíveis têm pouco espaço acima da cabeça e
+  uma cúpula alta corta o rosto.
+- `.svc` é o card branco de serviço usado sobre a faixa verde, com ícone circular.
+- `.statpill` é a pílula de número do hero; `.rulelist` é a lista com filete.
+- Botões são sempre pílula (`--r-full`).
+
+### Copy
+
+**Não use travessão (—) em texto visível.** Prefira vírgula, dois-pontos ou frase nova.
+A regra vale para `build/`, `assets/js/main.js` e qualquer texto novo.
 
 ## Convenções
 
 - Idioma: **português do Brasil**, incluindo nomes de classe quando fizer sentido
-- Copy: direta, sem jargão de marketing, sem promessa de cura. É saúde — não prometa resultado
+- Copy: direta, sem jargão de marketing, sem promessa de cura. É saúde, então não prometa resultado
 - Classes CSS: BEM frouxo (`.card`, `.card__img`, `.card--dark`), utilitários curtos (`.mt-6`, `.center`)
 - Animação de entrada: adicione `class="reveal"` e opcionalmente `data-d="1..4"` para delay
 - Contador animado: `<span data-count="10">0</span>`
@@ -121,10 +139,10 @@ Não invente cores novas fora dos tokens. Se precisar de um tom novo, adicione a
 ## Regras que não podem quebrar
 
 1. **Não fabricar depoimento, número ou credencial.** Os 3 depoimentos da home são
-   marcados como exemplo com comentário `⚠️` no HTML — só podem ser trocados por
+   marcados como exemplo com comentário `⚠️` no HTML. Só podem ser trocados por
    avaliações reais.
 2. **Não prometer cura ou resultado garantido.** Conteúdo de saúde.
-3. **Manter os CTAs de WhatsApp** em toda página — é o objetivo primário do site.
+3. **Manter os CTAs de WhatsApp** em toda página, que é o objetivo primário do site.
 4. **Manter o JSON-LD válido** ao mexer em conteúdo de página. Valide em
    https://validator.schema.org/ depois de mudanças estruturais.
 5. **Não adicionar backend.** O formulário monta a mensagem e abre o WhatsApp
@@ -143,9 +161,10 @@ Não invente cores novas fora dos tokens. Se precisar de um tom novo, adicione a
 ## Comandos
 
 ```bash
-npm run dev      # servidor local em http://localhost:8080 (só precisa de Python)
-npm run build    # regenera as 12 páginas a partir de build/
-npm run check    # valida HTML, JSON-LD, alt de imagens e links internos
+npm run dev      # servidor local em http://localhost:8080 (tools/serve.mjs, só Node)
+npm run build    # regenera as 12 páginas a partir de build/ (precisa de Python 3)
+npm run check    # valida HTML, JSON-LD, alt de imagens e links internos (só Node)
 ```
 
-`npm run dev` e `npm run check` usam apenas Python 3 e Node — não há `npm install`.
+Não há `npm install`: nenhum dos comandos tem dependência externa.
+Só `npm run build` precisa de Python 3 no PATH.

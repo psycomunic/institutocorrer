@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Instituto Correr — dados e partials compartilhados."""
+"""Instituto Correr: dados e partials compartilhados."""
 
 SITE = "https://institutocorrer.com.br"
 NAME = "Instituto Correr"
@@ -7,12 +7,12 @@ PHONE_DISPLAY = "(47) 3222-3565"
 PHONE_TEL = "+554732223565"
 WA = "554732223565"
 EMAIL = "contato@institutocorrer.com.br"
-STREET = "Rua Frederico Busch Júnior, 101 — Ed. Oswaldo Cruz"
+STREET = "Rua Frederico Busch Júnior, 101, Ed. Oswaldo Cruz"
 CITY = "Blumenau"
 STATE = "SC"
 CEP = "89020-400"
-ADDRESS_FULL = STREET + " — " + CITY + "/" + STATE + " — CEP " + CEP
-HOURS = "Seg. a Sex., 7h–12h e 13h–20h"
+ADDRESS_FULL = STREET + ", " + CITY + "/" + STATE + ", CEP " + CEP
+HOURS = "Seg. a sex., das 7h às 12h e das 13h às 20h"
 
 def wa_link(msg="Olá! Gostaria de agendar uma avaliação no Instituto Correr."):
     from urllib.parse import quote
@@ -68,7 +68,7 @@ IC = {
 TREATMENTS = [
     dict(slug="fisioterapia", nome="Fisioterapia", icon="stethoscope",
          tag="Reabilitação e prevenção",
-         curto="Avaliação detalhada e conduta individualizada para resolver a causa da dor — não apenas o sintoma.",
+         curto="Avaliação detalhada e conduta individualizada para resolver a causa da dor, não apenas o sintoma.",
          bullets=["Dor lombar, cervical e de ombro", "Lesões esportivas e pós-operatório", "Retorno seguro às atividades"]),
     dict(slug="quiropraxia", nome="Quiropraxia", icon="bone",
          tag="Ajuste articular",
@@ -110,7 +110,7 @@ def head(title, desc, canonical, schema_extra="", og_type="website"):
 <link rel="canonical" href="@@CANON@@">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="author" content="Instituto Correr">
-<meta name="theme-color" content="#1C1F2B">
+<meta name="theme-color" content="#232F1B">
 <meta name="geo.region" content="BR-SC">
 <meta name="geo.placename" content="Blumenau">
 
@@ -133,7 +133,7 @@ def head(title, desc, canonical, schema_extra="", og_type="website"):
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&family=Inter:wght@400..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 @@SCHEMA@@
 </head>
@@ -167,7 +167,7 @@ def header(active=""):
     return """
 <header class="header">
   <div class="header__inner">
-    <a class="brand" href="index.html" aria-label="Instituto Correr — página inicial">
+    <a class="brand" href="index.html" aria-label="Instituto Correr, página inicial">
       <img src="assets/img/logo.webp" alt="Instituto Correr" width="220" height="69" fetchpriority="high">
     </a>
     <nav class="nav" aria-label="Navegação principal">
@@ -202,7 +202,7 @@ def header(active=""):
 
 
 def cta_band(title="Sua próxima consulta pode ser o começo do fim da dor",
-             text="Agende uma avaliação completa e descubra, com clareza, o que está acontecendo com o seu corpo — e qual é o caminho mais curto para você voltar a se mover sem medo."):
+             text="Agende uma avaliação completa e descubra, com clareza, o que está acontecendo com o seu corpo e qual é o caminho mais curto para você voltar a se mover sem medo."):
     return """
 <section class="section cta-band">
   <div class="container center">
@@ -232,7 +232,7 @@ def footer():
     <div class="footer__grid">
       <div>
         <img class="flogo" src="assets/img/logo-branca.webp" alt="Instituto Correr" width="180" height="52" loading="lazy">
-        <p>Fisioterapia, quiropraxia e pilates em Blumenau. Cuidamos da saúde do seu movimento para você fazer o que quiser — sem se preocupar com a dor.</p>
+        <p>Fisioterapia, quiropraxia e pilates em Blumenau. Cuidamos da saúde do seu movimento para você fazer o que quiser, sem se preocupar com a dor.</p>
         <div class="socials">
           <a href="https://www.instagram.com/institutocorrer/" target="_blank" rel="noopener" aria-label="Instagram">@@IG@@</a>
           <a href="https://www.facebook.com/institutocorrer" target="_blank" rel="noopener" aria-label="Facebook">@@FB@@</a>
@@ -259,13 +259,13 @@ def footer():
           <li><a href="tel:@@TEL@@">@@PH@@</a></li>
           <li><a href="mailto:@@EMAIL@@">@@EMAIL@@</a></li>
           <li style="color:rgba(255,255,255,.6)">@@HOURS@@</li>
-          <li><a href="https://www.google.com/maps/search/?api=1&amp;query=@@MAPQ@@" target="_blank" rel="noopener">@@STREET@@<br>@@CITY@@/@@STATE@@ — @@CEP@@</a></li>
+          <li><a href="https://www.google.com/maps/search/?api=1&amp;query=@@MAPQ@@" target="_blank" rel="noopener">@@STREET@@<br>@@CITY@@/@@STATE@@, CEP @@CEP@@</a></li>
         </ul>
       </div>
     </div>
     <div class="footer__bottom">
       <span>© <span data-year>2026</span> Instituto Correr. Todos os direitos reservados.</span>
-      <span>Responsável técnico: Roger Levi Andrade — CREFITO 175512</span>
+      <span>Responsável técnico: Roger Levi Andrade, CREFITO 175512</span>
     </div>
   </div>
 </footer>
@@ -295,7 +295,7 @@ def phero(crumbs, eyebrow, h1, lead):
   <div class="container">
     <div class="phero__inner">
       <nav class="crumbs" aria-label="Você está aqui">@@C@@</nav>
-      <span class="eyebrow" style="margin-top:1.25rem">@@E@@</span>
+      <span class="eyebrow">@@E@@</span>
       <h1>@@H@@</h1>
       <p class="lead measure">@@L@@</p>
     </div>

@@ -2,10 +2,10 @@
   "name": "instituto-correr-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Site institucional do Instituto Correr — fisioterapia, quiropraxia e pilates em Blumenau/SC",
+  "description": "Site institucional do Instituto Correr: fisioterapia, quiropraxia e pilates em Blumenau/SC",
   "scripts": {
-    "dev": "python3 -m http.server 8080 || python -m http.server 8080",
-    "build": "cd build && python3 build.py",
+    "dev": "node tools/serve.mjs 8080",
+    "build": "cd build && python3 build.py || python build.py",
     "check": "node tools/check.mjs",
     "start": "npm run dev"
   },
