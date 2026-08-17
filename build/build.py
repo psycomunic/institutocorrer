@@ -95,33 +95,31 @@ def build_home():
         "Fisioterapia e Quiropraxia em Blumenau | Instituto Correr",
         "Fisioterapia, quiropraxia e pilates em Blumenau/SC. Avaliação detalhada e tratamento individualizado para você voltar a se mover sem dor.",
         SITE + "/", sch)
-    h += header("index.html")
+    h += header("index.html", overlay=True)
     h += """
 <main id="main">
 
 <!-- ===== HERO ===== -->
-<section class="hero">
-  <div class="container">
-    <div class="hero__inner">
-      <div>
-        <span class="eyebrow reveal">Blumenau · Santa Catarina</span>
-        <h1 class="reveal" data-d="1">Volte a fazer o que quiser, <em>sem se preocupar com a dor</em></h1>
-        <p class="lead reveal" data-d="2">Fisioterapia, quiropraxia e pilates com avaliação detalhada e conduta individualizada. A gente trata a causa, não só o sintoma, para que você volte ao movimento com segurança e sem recaída.</p>
-        <div class="btn-row reveal" data-d="3">
-          <a class="btn btn--primary btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
-          <a class="btn btn--ghost btn--lg" href="metodo.html">Conhecer o método</a>
-        </div>
+<section class="hero hero--full">
+  <div class="hero__bg">
+    <img src="assets/img/hero.jpg" alt="Pessoa correndo ao ar livre, retomando as atividades sem dor" width="1920" height="1047" fetchpriority="high">
+  </div>
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <span class="eyebrow reveal">Blumenau · Santa Catarina</span>
+      <h1 class="reveal" data-d="1">Volte a fazer o que quiser, <em>sem se preocupar com a dor</em></h1>
+      <p class="lead reveal" data-d="2">Fisioterapia, quiropraxia e pilates com avaliação detalhada e conduta individualizada. A gente trata a causa, não só o sintoma, para que você volte ao movimento com segurança e sem recaída.</p>
+      <div class="btn-row reveal" data-d="3">
+        <a class="btn btn--primary btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
+        <a class="btn btn--light btn--lg" href="metodo.html">Conhecer o método</a>
       </div>
-      <div class="hero__media reveal" data-d="2">
-        <div class="arch">
-          <img src="assets/img/hero.jpg" alt="Pessoa correndo ao ar livre, retomando as atividades sem dor" width="1920" height="1047" fetchpriority="high">
-        </div>
-        <div class="hero__badge">
-          <span class="ic">@@ICSHIELD@@</span>
-          <div><b>Avaliação antes de qualquer conduta</b><span>Sem protocolo genérico</span></div>
-        </div>
+    </div>
+    <div class="hero__foot reveal" data-d="4">
+      <div class="hero__badge">
+        <span class="ic">@@ICSHIELD@@</span>
+        <div><b>Avaliação antes de qualquer conduta</b><span>Sem protocolo genérico</span></div>
       </div>
-      <div class="statpills hero__stats reveal" data-d="3">
+      <div class="statpills">
         <div class="statpill"><b><span data-count="10">0</span>+</b><span>anos de prática clínica</span></div>
         <div class="statpill"><b><span data-count="5">0</span></b><span>especialidades integradas</span></div>
         <div class="statpill"><b>3</b><span>prevenir, reabilitar, performar</span></div>

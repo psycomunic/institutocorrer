@@ -210,6 +210,30 @@ strong { color: var(--ink); font-weight: 620; }
 .brand { display: flex; align-items: center; flex: none; }
 .brand img { height: 42px; width: auto; transition: height .3s var(--ease); }
 .header.is-scrolled .brand img { height: 34px; }
+.brand__light { display: none; }
+
+/* Header sobre o hero de imagem cheia. Fica transparente no topo e vira
+   branco ao rolar. O logo padrao tem fundo branco solido e viraria uma
+   caixa sobre a foto, entao aqui usamos a versao branca. */
+.header--overlay:not(.is-scrolled) {
+  background: transparent;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  box-shadow: none; border-bottom-color: transparent;
+}
+.header--overlay:not(.is-scrolled) .brand__dark { display: none; }
+.header--overlay:not(.is-scrolled) .brand__light { display: block; }
+.header--overlay:not(.is-scrolled) .nav__link { color: rgba(255,255,255,.86); }
+.header--overlay:not(.is-scrolled) .nav__link:hover { color: #fff; background: rgba(255,255,255,.14); }
+.header--overlay:not(.is-scrolled) .nav__link.is-active { color: #fff; background: rgba(255,255,255,.18); }
+.header--overlay:not(.is-scrolled) .burger { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+.header--overlay:not(.is-scrolled) .burger span { background: #fff; }
+
+/* Com o menu mobile aberto o painel e branco, entao o header volta ao normal. */
+body.no-scroll .header--overlay { background: rgba(255,255,255,.96); }
+body.no-scroll .header--overlay .brand__dark { display: block; }
+body.no-scroll .header--overlay .brand__light { display: none; }
+body.no-scroll .header--overlay .burger { background: var(--white); border-color: var(--line); }
+body.no-scroll .header--overlay .burger span { background: var(--forest-700); }
 
 .nav { margin-left: auto; display: flex; align-items: center; gap: .15rem; }
 .nav__link {
@@ -281,34 +305,57 @@ body.no-scroll { overflow: hidden; }
 .arch-duo .arch:first-child { margin-bottom: 2.5rem; }
 
 /* ---------- 9. Hero ---------- */
-.hero { position: relative; padding-top: calc(var(--nav-h) + clamp(2rem, 5vw, 4rem)); padding-bottom: clamp(3rem, 6vw, 5rem); overflow: hidden; }
-.hero::before {
-  content: ""; position: absolute; top: -22%; right: -14%; width: 720px; height: 720px;
-  background: radial-gradient(circle, rgba(76,100,56,.11) 0%, rgba(76,100,56,0) 68%);
-  border-radius: 50%; pointer-events: none;
-}
-.hero__inner {
-  position: relative; z-index: 1;
-  display: grid; grid-template-columns: 1.05fr .95fr .62fr;
-  gap: clamp(1.5rem, 3.5vw, 3.25rem); align-items: center;
-}
-.hero h1 { margin-top: 1.2rem; }
-.hero h1 em { font-style: normal; color: var(--forest-500); }
-.hero .lead { margin-top: 1.4rem; max-width: 30rem; }
-.hero .btn-row { margin-top: 2.2rem; }
-.hero__media { position: relative; }
-.hero__media .arch { aspect-ratio: 4/5.2; box-shadow: var(--sh-lg); }
-/* A foto do hero e panoramica e o corredor esta a direita do quadro. */
-.hero__media .arch img { object-position: 74% center; }
+.hero { position: relative; overflow: hidden; }
 .hero__badge {
-  position: absolute; left: -1.6rem; bottom: 2rem;
   background: var(--white); border-radius: var(--r-lg); padding: 1rem 1.25rem;
-  box-shadow: var(--sh-lg); display: flex; align-items: center; gap: .85rem; max-width: 262px;
+  box-shadow: var(--sh-lg); display: flex; align-items: center; gap: .85rem; max-width: 288px;
 }
 .hero__badge .ic { width: 42px; height: 42px; border-radius: 50%; background: var(--forest-100); color: var(--forest-600); display: grid; place-items: center; flex: none; }
 .hero__badge .ic svg { width: 21px; height: 21px; }
 .hero__badge b { display: block; font-size: .91rem; color: var(--ink); font-weight: 620; line-height: 1.3; }
 .hero__badge span { display: block; font-size: .77rem; color: var(--ink-dim); margin-top: 2px; }
+
+/* ---------- 9b. Hero de imagem cheia (home) ---------- */
+.hero--full {
+  /* 1047/1920 = 54.5%, a proporcao da propria foto. Como piso de altura, o
+     cover nao corta nada. Nao usar aspect-ratio aqui: ele fixa a altura e o
+     rodape do bloco fica cortado pelo overflow quando o texto cresce.
+     Com min-height o bloco ainda pode crescer se o conteudo precisar. */
+  min-height: clamp(560px, 54.5vw, 820px);
+  padding: 0; display: flex; align-items: stretch;
+  background: var(--forest-900);
+}
+.hero--full::before, .hero--full::after { content: none; }
+
+.hero__bg { position: absolute; inset: 0; overflow: hidden; }
+.hero__bg img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; }
+/* Duas camadas de escurecimento: uma na diagonal, para segurar o texto do
+   lado esquerdo, e uma na base, para as pilulas e o rodape do bloco. */
+.hero__bg::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(100deg, rgba(20,28,15,.94) 0%, rgba(20,28,15,.82) 34%, rgba(20,28,15,.42) 58%, rgba(20,28,15,.14) 78%),
+    linear-gradient(to top, rgba(20,28,15,.72) 0%, rgba(20,28,15,0) 42%);
+}
+
+/* O espacamento vertical aqui e contido de proposito: cada rem a mais
+   estica a caixa alem da proporcao da foto e volta a cortar a imagem. */
+.hero--full .hero__inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; justify-content: space-between; gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding-top: calc(var(--nav-h) + clamp(1.5rem, 3.5vw, 2.75rem));
+  padding-bottom: clamp(1.75rem, 3vw, 2.5rem);
+}
+.hero__copy { max-width: 36rem; }
+.hero--full .eyebrow { color: var(--forest-200); }
+.hero--full h1 { color: #fff; margin-top: .9rem; font-size: clamp(2.25rem, 4.4vw, 3.45rem); }
+.hero--full h1 em { font-style: normal; color: var(--forest-200); }
+.hero--full .lead { color: rgba(255,255,255,.82); margin-top: 1.05rem; max-width: 32rem; font-size: clamp(1.02rem, 1.3vw, 1.14rem); }
+.hero--full .btn-row { margin-top: 1.7rem; }
+
+.hero__foot { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1rem, 2.2vw, 1.5rem); }
+.hero__foot .hero__badge { position: static; margin: 0; flex: 0 1 auto; }
+.hero__foot .statpills { grid-template-columns: repeat(3, minmax(0, 1fr)); flex: 1 1 420px; }
 
 /* Pílulas de número */
 .statpills { display: grid; gap: clamp(.7rem, 1.4vw, 1rem); }
@@ -324,6 +371,13 @@ body.no-scroll { overflow: hidden; }
 }
 .statpill b span { display: inline; font-size: inherit; color: inherit; letter-spacing: inherit; }
 .statpill > span { display: block; margin-top: .5rem; font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-dim); line-height: 1.45; }
+
+/* Sobre a foto do hero as pílulas viram vidro */
+.hero--full .statpill { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.26); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.hero--full .statpill:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.45); }
+.hero--full .statpill b { color: #fff; }
+/* Rotulo pequeno em caixa alta sobre foto: nao baixar mais que isto. */
+.hero--full .statpill > span { color: rgba(255,255,255,.84); }
 
 /* Hero de páginas internas */
 .phero { position: relative; padding-top: calc(var(--nav-h) + clamp(2.8rem, 5.5vw, 4.5rem)); padding-bottom: clamp(2.8rem, 5vw, 4rem); background: var(--white); border-bottom: 1px solid var(--line-soft); overflow: hidden; }
@@ -580,23 +634,16 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* ---------- 21. Responsivo ---------- */
-@media (max-width: 1180px) {
-  .hero__inner { grid-template-columns: 1.1fr .9fr; }
-  .hero__stats { grid-column: 1 / -1; }
-  .statpills { grid-template-columns: repeat(3, 1fr); }
-}
 @media (max-width: 1080px) {
   .nav__link { padding: .6rem .65rem; font-size: .88rem; }
   .footer__grid { grid-template-columns: 1fr 1fr; }
+  .hero__foot { flex-direction: column; align-items: stretch; }
+  .hero__foot .hero__badge { max-width: none; }
 }
 @media (max-width: 940px) {
   :root { --nav-h: 74px; }
   .nav, .header__cta { display: none; }
   .burger { display: block; }
-  .hero__inner { grid-template-columns: 1fr; }
-  .hero__media { order: -1; max-width: 460px; margin-inline: auto; }
-  .hero__media .arch { aspect-ratio: 4/4.2; }
-  .hero__badge { left: auto; right: -.5rem; bottom: 1rem; }
   .split { grid-template-columns: 1fr; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
@@ -617,8 +664,17 @@ body.no-scroll { overflow: hidden; }
   .map-wrap iframe { height: 320px; }
   .btn { width: 100%; }
   .btn-row { flex-direction: column; }
-  .hero__badge { position: static; margin-top: 1rem; max-width: none; }
-  .hero__media { max-width: none; }
+  .hero__badge { max-width: none; }
+  /* No celular a foto e panoramica num quadro alto: o recorte fica severo,
+     entao a altura cede e o escurecimento passa a ser uniforme. */
+  .hero--full { min-height: 0; }
+  .hero--full .hero__inner { padding-bottom: 2.5rem; }
+  .hero__bg img { object-position: 68% center; }
+  .hero__bg::after {
+    background:
+      linear-gradient(180deg, rgba(20,28,15,.78) 0%, rgba(20,28,15,.86) 55%, rgba(20,28,15,.94) 100%);
+  }
+  .hero__foot .statpills { grid-template-columns: 1fr; }
 }
 
 /* ---------- 22. Impressão ---------- */

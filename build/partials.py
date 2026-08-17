@@ -144,7 +144,9 @@ def head(title, desc, canonical, schema_extra="", og_type="website"):
    .replace("@@SCHEMA@@", schema_extra).replace("@@OGTYPE@@", og_type)
 
 
-def header(active=""):
+def header(active="", overlay=False):
+    """overlay=True deixa o header transparente sobre o hero de imagem cheia,
+    trocando o logo pela versao branca ate a pagina rolar."""
     links = ""
     for href, label in NAV:
         cls = "nav__link is-active" if href == active else "nav__link"
@@ -165,10 +167,11 @@ def header(active=""):
         m_sub += '<a href="' + t["slug"] + '.html">' + t["nome"] + '</a>'
 
     return """
-<header class="header">
+<header class="header@@OVER@@">
   <div class="header__inner">
     <a class="brand" href="index.html" aria-label="Instituto Correr, página inicial">
-      <img src="assets/img/logo.webp" alt="Instituto Correr" width="220" height="69" fetchpriority="high">
+      <img class="brand__dark" src="assets/img/logo.webp" alt="Instituto Correr" width="220" height="69" fetchpriority="high">
+      <img class="brand__light" src="assets/img/logo-branca.webp" alt="" aria-hidden="true" width="200" height="75">
     </a>
     <nav class="nav" aria-label="Navegação principal">
       @@LINKS@@
@@ -195,7 +198,8 @@ def header(active=""):
   <a href="contato.html">Contato</a>
   <a class="btn btn--primary" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
 </div>
-""".replace("@@LINKS@@", links).replace("@@DROP@@", drop_items).replace("@@TRACT@@", tr_active)\
+""".replace("@@OVER@@", " header--overlay" if overlay else "")\
+   .replace("@@LINKS@@", links).replace("@@DROP@@", drop_items).replace("@@TRACT@@", tr_active)\
    .replace("@@MLINKS@@", m_links).replace("@@MSUB@@", m_sub)\
    .replace("@@CHEV@@", IC["chev"]).replace("@@ICARROW@@", IC["arrow"])\
    .replace("@@ICWA@@", IC["whatsapp"]).replace("@@WA@@", wa_link())
