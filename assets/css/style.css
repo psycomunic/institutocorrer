@@ -292,6 +292,9 @@ body.no-scroll { overflow: hidden; }
 }
 .arch img { width: 100%; height: 100%; object-fit: cover; }
 .arch--sm { border-radius: 50% 50% var(--r-lg) var(--r-lg) / 30% 30% var(--r-lg) var(--r-lg); }
+/* Foto de apoio das páginas de tratamento. As fotos são 2:3; o 3/4 aqui
+   encorpa a imagem na coluna sem cortar o que importa. */
+.arch--media { aspect-ratio: 3 / 4; box-shadow: var(--sh-md); }
 
 /* Trio de arcos, escalonado */
 .arch-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(.7rem, 1.4vw, 1.1rem); align-items: end; }
@@ -650,6 +653,9 @@ body.no-scroll { overflow: hidden; }
   .stats { grid-template-columns: repeat(2, 1fr); row-gap: 2.5rem; }
   .arch-trio .arch:nth-child(1), .arch-trio .arch:nth-child(3) { margin-bottom: 0; }
   .arch-duo .arch:first-child { margin-bottom: 0; }
+  /* Com o split empilhado a coluna vira largura cheia e a foto vertical
+     ficaria gigante. */
+  .arch--media { max-width: 420px; margin-inline: auto; }
 }
 @media (max-width: 640px) {
   body { font-size: 1rem; }

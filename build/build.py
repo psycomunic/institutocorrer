@@ -739,9 +739,26 @@ TDATA = {
 }
 
 
+# Foto de cada tratamento. O alt descreve o que a imagem mostra, nao repete
+# o nome do tratamento, que ja esta no h1 e no h2 ao lado.
+TIMG = {
+"fisioterapia": ("trat-fisioterapia.webp", 900, 1349,
+  "Fisioterapeuta orientando exercício com faixa elástica na perna de um paciente deitado na maca"),
+"quiropraxia": ("trat-quiropraxia.webp", 900, 1350,
+  "Quiropraxista aplicando um ajuste na coluna de uma paciente deitada de bruços"),
+"pilates": ("trat-pilates.webp", 900, 1350,
+  "Instrutora corrigindo a postura de uma aluna em aparelho de pilates no estúdio"),
+"liberacao-miofascial": ("trat-liberacao-miofascial.webp", 900, 1350,
+  "Terapeuta trabalhando a musculatura do pescoço e do ombro de uma paciente"),
+"terapias-manuais": ("trat-terapias-manuais.webp", 900, 1125,
+  "Fisioterapeuta mobilizando o braço de uma paciente deitada na maca"),
+}
+
+
 def build_treatment(slug):
     t = TMAP[slug]
     d = TDATA[slug]
+    img_file, img_w, img_h, img_alt = TIMG[slug]
     sch = S.tags(S.ORG, S.service(t),
                  S.breadcrumb([("Tratamentos", "tratamentos.html"), (t["nome"], slug + ".html")]),
                  S.faq(d["faq"]))
@@ -777,7 +794,7 @@ def build_treatment(slug):
         </div>
       </div>
       <div class="reveal" data-d="1">
-        <div class="media-img media-img--plain"><img src="assets/img/metodo.webp" alt="@@TNOME@@ no Instituto Correr, Blumenau" width="768" height="727" loading="lazy"></div>
+        <div class="arch arch--media"><img src="assets/img/@@TIMG@@" alt="@@TIMGALT@@" width="@@TIMGW@@" height="@@TIMGH@@" loading="lazy"></div>
       </div>
     </div>
   </div>
@@ -844,6 +861,8 @@ def build_treatment(slug):
 </main>
 """.replace("@@IH@@", d["intro_h"]).replace("@@INTRO@@", intro).replace("@@BENE@@", bene)\
    .replace("@@PARA@@", para).replace("@@OTHERS@@", others)\
+   .replace("@@TIMG@@", img_file).replace("@@TIMGALT@@", img_alt)\
+   .replace("@@TIMGW@@", str(img_w)).replace("@@TIMGH@@", str(img_h))\
    .replace("@@TNOME@@", t["nome"]).replace("@@TNOMEL@@", t["nome"].lower())\
    .replace("@@WAT@@", wa_link("Olá! Gostaria de agendar uma avaliação para " + t["nome"] + " no Instituto Correr."))
 
