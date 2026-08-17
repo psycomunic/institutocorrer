@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Servidor local (8080)",
+      "type": "shell",
+      "command": "python3 -m http.server 8080 || python -m http.server 8080",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Rebuild das páginas",
+      "type": "shell",
+      "command": "cd build && python3 build.py || python build.py",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Verificar site",
+      "type": "shell",
+      "command": "node tools/check.mjs",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    }
+  ]
+}

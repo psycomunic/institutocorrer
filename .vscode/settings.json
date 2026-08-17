@@ -1,0 +1,21 @@
+{
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": false,
+  "editor.wordWrap": "on",
+  "emmet.includeLanguages": { "html": "html" },
+  "html.format.wrapLineLength": 0,
+  "css.lint.unknownAtRules": "ignore",
+  "[python]": { "editor.tabSize": 4 },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true
+  },
+  "files.associations": { "*.html": "html" },
+  "cSpell.language": "pt,en",
+  "liveServer.settings.port": 8080,
+  "liveServer.settings.root": "/"
+}
