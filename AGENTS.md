@@ -94,6 +94,23 @@ TREATMENTS    = [...]              # 5 tratamentos: slug, nome, ícone, resumo, 
 Mudou o telefone? Muda ali e roda `npm run build`. Atualiza nas 12 páginas de uma vez,
 incluindo os links `wa.me`, o schema e o rodapé.
 
+### O domínio das URLs absolutas
+
+`og:image`, `og:url`, `canonical` e o `sitemap.xml` precisam de URL absoluta, e essa
+URL tem que existir de verdade. `SITE` resolve nesta ordem:
+
+1. variável de ambiente `SITE_URL`, se definida
+2. `VERCEL_PROJECT_PRODUCTION_URL`, que a Vercel injeta no build
+3. `SITE_FINAL`, o `institutocorrer.com.br`
+
+Isso existe porque, enquanto o domínio próprio ainda serve o WordPress antigo, apontar
+o `og:image` para lá devolve 404 e o preview de compartilhamento sai sem banner.
+Quando o domínio for adicionado ao projeto na Vercel, o passo 2 já retorna ele e nada
+precisa ser alterado.
+
+**Consequência:** o HTML commitado usa o domínio final, mas o HTML publicado usa o
+domínio de produção da Vercel. Quem manda é o build que roda no deploy.
+
 Equipe fica em `build/build.py` → lista `TEAM`.
 Conteúdo das páginas de tratamento fica em `build/build.py` → dict `TDATA`.
 

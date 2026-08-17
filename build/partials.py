@@ -1,7 +1,21 @@
 # -*- coding: utf-8 -*-
 """Instituto Correr: dados e partials compartilhados."""
 
-SITE = "https://institutocorrer.com.br"
+import os
+
+# Domínio final, para onde o institutocorrer.com.br vai apontar.
+SITE_FINAL = "https://institutocorrer.com.br"
+
+# og:image, og:url, canonical e sitemap exigem URL absoluta. Enquanto o
+# domínio próprio ainda serve o site antigo, apontar para ele faz o robô do
+# WhatsApp e do Facebook buscarem a imagem lá, receberem 404 e mostrarem o
+# preview sem banner. Então o build usa o domínio onde o site está de fato
+# publicado. Na Vercel isso vem pronto em VERCEL_PROJECT_PRODUCTION_URL, que
+# passa a ser o domínio próprio assim que ele for adicionado ao projeto.
+# Nada disso muda o build local, que continua usando o domínio final.
+SITE = (os.environ.get("SITE_URL")
+        or ("https://" + os.environ["VERCEL_PROJECT_PRODUCTION_URL"]
+            if os.environ.get("VERCEL_PROJECT_PRODUCTION_URL") else SITE_FINAL))
 NAME = "Instituto Correr"
 PHONE_DISPLAY = "(47) 3222-3565"
 PHONE_TEL = "+554732223565"
