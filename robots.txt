@@ -1,3 +1,141 @@
+# Instituto Correr: fisioterapia, quiropraxia e pilates em Blumenau/SC
+# Resumo para assistentes de IA: https://institutocorrerblumenau.com/llms.txt
+
+User-agent: Googlebot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Bingbot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: GPTBot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Claude-User
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Applebot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /build/
+Disallow: /tools/
+Disallow: /AGENTS.md
+Disallow: /COMECE-AQUI.md
+Disallow: /LEIA-ME.md
+Disallow: /package.json
+
 User-agent: *
 Allow: /
 Disallow: /build/
@@ -7,4 +145,4 @@ Disallow: /COMECE-AQUI.md
 Disallow: /LEIA-ME.md
 Disallow: /package.json
 
-Sitemap: https://institutocorrer.com.br/sitemap.xml
+Sitemap: https://institutocorrerblumenau.com/sitemap.xml

@@ -3,8 +3,8 @@
 
 import os
 
-# Domínio final, para onde o institutocorrer.com.br vai apontar.
-SITE_FINAL = "https://institutocorrer.com.br"
+# Domínio oficial. O antigo institutocorrer.com.br (WordPress) deve redirecionar para cá.
+SITE_FINAL = "https://institutocorrerblumenau.com"
 
 # og:image, og:url, canonical e sitemap exigem URL absoluta. Enquanto o
 # domínio próprio ainda serve o site antigo, apontar para ele faz o robô do
@@ -27,6 +27,55 @@ STATE = "SC"
 CEP = "89020-400"
 ADDRESS_FULL = STREET + ", " + CITY + "/" + STATE + ", CEP " + CEP
 HOURS = "Seg. a sex., das 7h às 12h e das 13h às 20h"
+INSTAGRAM = "https://www.instagram.com/institutocorrer/"
+FACEBOOK = "https://www.facebook.com/institutocorrer"
+# Trecho da rua com o CEP 89020-400 (OpenStreetMap). Troque pelas coordenadas
+# exatas do pin da clínica no Google Maps quando tiver o Perfil da Empresa.
+GEO = (-26.9313, -49.0552)
+
+# --------------------------------------------------------------------------
+# MEDIÇÃO DE CAMPANHAS
+# --------------------------------------------------------------------------
+# Preencha só o que for usar. Vazio = nenhum script de terceiros é carregado.
+# Também podem vir de variáveis de ambiente na Vercel, sem tocar no código.
+#   GTM_ID         "GTM-XXXXXXX"  (Google Tag Manager, recomendado)
+#   GTAG_IDS       "G-XXXXXXX,AW-XXXXXXXXX"  (GA4 e/ou Google Ads direto)
+#   META_PIXEL_ID  "123456789012345"
+# Os cliques em WhatsApp, telefone e e-mail e o envio do formulário viram
+# eventos (ver assets/js/main.js): "whatsapp_click", "phone_click",
+# "email_click" e "generate_lead". No Meta Pixel saem como "Contact"/"Lead".
+GTM_ID = os.environ.get("GTM_ID", "")
+GTAG_IDS = [x.strip() for x in os.environ.get("GTAG_IDS", "").split(",") if x.strip()]
+META_PIXEL_ID = os.environ.get("META_PIXEL_ID", "")
+
+
+def tracking_head():
+    out = ""
+    if GTM_ID:
+        out += ("<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});"
+                "var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;"
+                "j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);"
+                "})(window,document,'script','dataLayer','" + GTM_ID + "');</script>\n")
+    if GTAG_IDS:
+        out += ('<script async src="https://www.googletagmanager.com/gtag/js?id=' + GTAG_IDS[0] + '"></script>\n'
+                "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
+                "gtag('js',new Date());"
+                + "".join("gtag('config','" + i + "');" for i in GTAG_IDS) + "</script>\n")
+    if META_PIXEL_ID:
+        out += ("<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?"
+                "n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;"
+                "n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;"
+                "s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script',"
+                "'https://connect.facebook.net/en_US/fbevents.js');fbq('init','" + META_PIXEL_ID + "');"
+                "fbq('track','PageView');</script>\n")
+    return out
+
+
+def tracking_body():
+    if not GTM_ID:
+        return ""
+    return ('<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' + GTM_ID
+            + '" height="0" width="0" style="display:none;visibility:hidden" title="GTM"></iframe></noscript>\n')
 
 def wa_link(msg="Olá! Gostaria de agendar uma avaliação no Instituto Correr."):
     from urllib.parse import quote
@@ -140,7 +189,19 @@ NAV = [
 # --------------------------------------------------------------------------
 # HEAD / HEADER / FOOTER
 # --------------------------------------------------------------------------
-def head(title, desc, canonical, schema_extra="", og_type="website"):
+PAGE_KIND = {"": "WebPage", "sobre.html": "AboutPage", "contato.html": "ContactPage",
+             "equipe.html": "AboutPage", "metodo.html": "WebPage", "tratamentos.html": "CollectionPage"}
+
+
+def head(title, desc, canonical, schema_extra="", og_type="website", preload="", page_img=None):
+    # WebPage em JSON-LD para toda página indexável, a partir do mesmo title/description.
+    if canonical.startswith(SITE) and not canonical.endswith("404.html"):
+        import schema as _S
+        path = canonical[len(SITE) + 1:]
+        kind = PAGE_KIND.get(path, "MedicalWebPage")
+        about = (SITE + "/" + path + "#servico") if kind == "MedicalWebPage" else None
+        schema_extra += "\n" + _S.tags(_S.webpage(path, title, desc, kind, page_img, about))
+    pre = ('<link rel="preload" as="image" href="' + preload + '" fetchpriority="high">\n') if preload else ""
     return """<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -149,11 +210,15 @@ def head(title, desc, canonical, schema_extra="", og_type="website"):
 <title>@@TITLE@@</title>
 <meta name="description" content="@@DESC@@">
 <link rel="canonical" href="@@CANON@@">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta name="author" content="Instituto Correr">
 <meta name="theme-color" content="#232F1B">
 <meta name="geo.region" content="BR-SC">
 <meta name="geo.placename" content="Blumenau">
+<meta name="geo.position" content="@@GEOP@@">
+<meta name="ICBM" content="@@GEOI@@">
+<link rel="alternate" type="text/markdown" href="@@SITE@@/llms.txt" title="Resumo do site para assistentes de IA">
+@@PRELOAD@@@@TRACK@@
 
 <meta property="og:type" content="@@OGTYPE@@">
 <meta property="og:locale" content="pt_BR">
@@ -182,8 +247,11 @@ def head(title, desc, canonical, schema_extra="", og_type="website"):
 @@SCHEMA@@
 </head>
 <body>
-<a class="skip-link" href="#main">Pular para o conteúdo</a>
-""".replace("@@TITLE@@", title).replace("@@DESC@@", desc)\
+@@TRACKB@@<a class="skip-link" href="#main">Pular para o conteúdo</a>
+""".replace("@@PRELOAD@@", pre).replace("@@TRACKB@@", tracking_body())\
+   .replace("@@TRACK@@", tracking_head())\
+   .replace("@@GEOP@@", "%s;%s" % GEO).replace("@@GEOI@@", "%s, %s" % GEO)\
+   .replace("@@TITLE@@", title).replace("@@DESC@@", desc)\
    .replace("@@CANON@@", canonical).replace("@@SITE@@", SITE)\
    .replace("@@SCHEMA@@", schema_extra).replace("@@OGTYPE@@", og_type)
 
@@ -282,8 +350,8 @@ def footer():
         <img class="flogo" src="assets/img/logo-branca.webp" alt="Instituto Correr" width="180" height="52" loading="lazy">
         <p>Fisioterapia, quiropraxia e pilates em Blumenau. Cuidamos da saúde do seu movimento para você fazer o que quiser, sem se preocupar com a dor.</p>
         <div class="socials">
-          <a href="https://www.instagram.com/institutocorrer/" target="_blank" rel="noopener" aria-label="Instagram">@@IG@@</a>
-          <a href="https://www.facebook.com/institutocorrer" target="_blank" rel="noopener" aria-label="Facebook">@@FB@@</a>
+          <a href="@@IGURL@@" target="_blank" rel="noopener me" aria-label="Instagram do Instituto Correr">@@IG@@</a>
+          <a href="@@FBURL@@" target="_blank" rel="noopener me" aria-label="Facebook do Instituto Correr">@@FB@@</a>
           <a href="@@WA@@" target="_blank" rel="noopener" aria-label="WhatsApp">@@WAI@@</a>
         </div>
       </div>
@@ -326,6 +394,7 @@ def footer():
 </body>
 </html>
 """.replace("@@TR@@", tr).replace("@@IG@@", IC["instagram"]).replace("@@FB@@", IC["facebook"])\
+   .replace("@@IGURL@@", INSTAGRAM).replace("@@FBURL@@", FACEBOOK)\
    .replace("@@WAI@@", IC["whatsapp"]).replace("@@WA@@", wa_link())\
    .replace("@@TEL@@", PHONE_TEL).replace("@@PH@@", PHONE_DISPLAY).replace("@@EMAIL@@", EMAIL)\
    .replace("@@HOURS@@", HOURS).replace("@@STREET@@", STREET).replace("@@CITY@@", CITY)\

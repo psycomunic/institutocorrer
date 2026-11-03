@@ -101,7 +101,7 @@ URL tem que existir de verdade. `SITE` resolve nesta ordem:
 
 1. variável de ambiente `SITE_URL`, se definida
 2. `VERCEL_PROJECT_PRODUCTION_URL`, que a Vercel injeta no build
-3. `SITE_FINAL`, o `institutocorrer.com.br`
+3. `SITE_FINAL`, o `institutocorrerblumenau.com` (domínio oficial)
 
 Isso existe porque, enquanto o domínio próprio ainda serve o WordPress antigo, apontar
 o `og:image` para lá devolve 404 e o preview de compartilhamento sai sem banner.
@@ -167,13 +167,33 @@ A regra vale para `build/`, `assets/js/main.js` e qualquer texto novo.
 
 ## Pendências conhecidas
 
-- [ ] Confirmar o número de WhatsApp (hoje usa o telefone fixo)
+- [x] WhatsApp confirmado pela clínica: 554732223565 (mesmo número do telefone)
 - [ ] Confirmar endereço completo (número e complemento vieram truncados do site antigo)
 - [ ] Confirmar e-mail de contato
 - [ ] Trocar os 3 depoimentos de exemplo por avaliações reais
-- [ ] Ajustar `geo` (lat/long) em `build/schema.py` para as coordenadas exatas da clínica
+- [ ] Ajustar `GEO` em `build/partials.py` para o pin exato do Google Maps (hoje é o trecho da rua do CEP)
 - [ ] Fotos próprias da clínica e do estúdio de pilates (hoje o hero é uma imagem genérica)
-- [ ] Considerar redirects 301 das URLs antigas do WordPress (ver `LEIA-ME.md`)
+- [x] Redirects 301 das URLs antigas do WordPress em `vercel.json`
+- [ ] Apontar institutocorrerblumenau.com para a Vercel (DNS na Hostinger) e redirecionar institutocorrer.com.br (DNS na Cloudflare)
+- [ ] Preencher `GTM_ID` / `GTAG_IDS` / `META_PIXEL_ID` (variáveis de ambiente na Vercel)
+
+## SEO e IA
+
+- `head()` em `partials.py` gera sozinho o JSON-LD `WebPage` de cada página a partir do
+  title/description. O tipo vem de `PAGE_KIND` (tratamentos viram `MedicalWebPage`).
+- `schema.py`: clínica (`#clinica`), site (`#site`), Roger (`#roger`), Carla (`#carla`) e
+  `Service` por tratamento (`<slug>.html#servico`), todos ligados por `@id`.
+- `llms.txt` é gerado em `build_aux()` com dados, tratamentos, equipe e FAQ. É o resumo
+  que ChatGPT, Perplexity e Claude leem. Muda junto quando o conteúdo muda.
+- `robots.txt` libera explicitamente os robôs de busca e de IA (GPTBot, OAI-SearchBot,
+  PerplexityBot, ClaudeBot, Google-Extended...). Não bloqueie nenhum deles.
+- `vercel.json`: redirects 301 do WordPress antigo, `noindex` em `build/`, `tools/` e `.md`.
+
+## Medição
+
+`main.js` dispara `whatsapp_click`, `phone_click`, `email_click` (com `link_location`) e
+`generate_lead` no envio do formulário. Vão para `dataLayer`, `gtag` e `fbq` se existirem.
+As tags só carregam se `GTM_ID`, `GTAG_IDS` ou `META_PIXEL_ID` estiverem definidos.
 
 ## Comandos
 

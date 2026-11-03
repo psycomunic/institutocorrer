@@ -140,11 +140,42 @@
     });
   });
 
+  /* Medição de conversões
+     Empurra eventos no dataLayer (GTM) e, se existirem, chama gtag (GA4/Ads)
+     e fbq (Meta Pixel). Sem nenhuma tag configurada, não faz nada. */
+  function track(name, params) {
+    params = params || {};
+    params.page_path = location.pathname;
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: name }, params));
+      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', name === 'generate_lead' ? 'Lead' : 'Contact', params);
+      }
+    } catch (err) { /* medição nunca pode quebrar o clique */ }
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    var where = a.closest('header, .mnav') ? 'header'
+      : a.closest('.wa-float') ? 'botao_flutuante'
+      : a.closest('footer') ? 'rodape'
+      : a.closest('.cta-band') ? 'cta_final'
+      : a.closest('.hero, .phero') ? 'topo' : 'conteudo';
+    if (/^https:\/\/wa\.me\//.test(href)) track('whatsapp_click', { link_location: where });
+    else if (/^tel:/.test(href)) track('phone_click', { link_location: where });
+    else if (/^mailto:/.test(href)) track('email_click', { link_location: where });
+  });
+
   /* Form → WhatsApp */
   var form = document.querySelector('[data-wa-form]');
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      track('generate_lead', { form_name: 'agendamento', service: String(new FormData(form).get('servico') || '') });
       var f = new FormData(form);
       var msg =
         'Olá, Instituto Correr! Gostaria de agendar uma avaliação.\n\n' +

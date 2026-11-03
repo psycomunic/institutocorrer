@@ -97,11 +97,11 @@ FAQ_HOME = [
 ]
 
 def build_home():
-    sch = S.tags(S.ORG, S.WEBSITE, S.faq(FAQ_HOME))
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.faq(FAQ_HOME))
     h = head(
         "Fisioterapia e Quiropraxia em Blumenau | Instituto Correr",
         "Fisioterapia, quiropraxia e pilates em Blumenau/SC. Avaliação detalhada e tratamento individualizado para você voltar a se mover sem dor.",
-        SITE + "/", sch)
+        SITE + "/", sch, preload="assets/img/hero.jpg", page_img="hero.jpg")
     h += header("index.html", overlay=True)
     h += """
 <main id="main">
@@ -113,7 +113,7 @@ def build_home():
   </div>
   <div class="container hero__inner">
     <div class="hero__copy">
-      <span class="eyebrow reveal">Blumenau · Santa Catarina</span>
+      <span class="eyebrow reveal">Fisioterapia, quiropraxia e pilates em Blumenau</span>
       <h1 class="reveal" data-d="1">Volte a fazer o que quiser, <em>sem se preocupar com a dor</em></h1>
       <p class="lead reveal" data-d="2">Fisioterapia, quiropraxia e pilates com avaliação detalhada e conduta individualizada. A gente trata a causa, não só o sintoma, para que você volte ao movimento com segurança e sem recaída.</p>
       <div class="btn-row reveal" data-d="3">
@@ -362,7 +362,7 @@ def _fill(h, tcards="", team="", faq="", svc=""):
 # SOBRE
 # ==========================================================================
 def build_sobre():
-    sch = S.tags(S.ORG, S.breadcrumb([("Sobre nós", "sobre.html")]))
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.breadcrumb([("Sobre nós", "sobre.html")]))
     h = head("Sobre o Instituto Correr | Clínica de Fisioterapia em Blumenau",
              "Clínica de fisioterapia, quiropraxia e pilates em Blumenau/SC. Equipe multidisciplinar e base científica para prevenção, reabilitação e performance.",
              SITE + "/sobre.html", sch)
@@ -466,7 +466,7 @@ FAQ_METODO = [
 ]
 
 def build_metodo():
-    sch = S.tags(S.ORG, S.breadcrumb([("Nosso método", "metodo.html")]), S.faq(FAQ_METODO))
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.breadcrumb([("Nosso método", "metodo.html")]), S.faq(FAQ_METODO))
     h = head("Nosso Método | Instituto Correr, Fisioterapia em Blumenau",
              "Conheça o método do Instituto Correr: entender a dor, saúde individual, base científica e tecnologia humanizada. Avaliação detalhada antes de qualquer conduta.",
              SITE + "/metodo.html", sch)
@@ -554,7 +554,7 @@ def build_metodo():
 # EQUIPE
 # ==========================================================================
 def build_equipe():
-    sch = S.tags(S.ORG, S.breadcrumb([("Equipe", "equipe.html")]))
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.breadcrumb([("Equipe", "equipe.html")]))
     h = head("Equipe | Instituto Correr, Fisioterapeutas em Blumenau",
              "Conheça a equipe do Instituto Correr: fisioterapeutas, quiropraxia e atendimento. Responsável técnico Roger Levi Andrade, CREFITO 175512. Blumenau/SC.",
              SITE + "/equipe.html", sch)
@@ -604,7 +604,7 @@ def build_equipe():
 # TRATAMENTOS (hub)
 # ==========================================================================
 def build_tratamentos():
-    sch = S.tags(S.ORG, S.breadcrumb([("Tratamentos", "tratamentos.html")]))
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.breadcrumb([("Tratamentos", "tratamentos.html")]))
     h = head("Tratamentos | Fisioterapia, Quiropraxia e Pilates em Blumenau",
              "Fisioterapia, quiropraxia, pilates, liberação miofascial e terapias manuais em Blumenau/SC. Veja qual tratamento faz sentido para o seu caso no Instituto Correr.",
              SITE + "/tratamentos.html", sch)
@@ -778,12 +778,12 @@ def build_treatment(slug):
     t = TMAP[slug]
     d = TDATA[slug]
     img_file, img_w, img_h, img_alt = TIMG[slug]
-    sch = S.tags(S.ORG, S.service(t),
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.service(t, img_file, d["desc"]),
                  S.breadcrumb([("Tratamentos", "tratamentos.html"), (t["nome"], slug + ".html")]),
                  S.faq(d["faq"]))
-    h = head(d["title"], d["desc"], SITE + "/" + slug + ".html", sch, og_type="article")
+    h = head(d["title"], d["desc"], SITE + "/" + slug + ".html", sch, page_img=img_file)
     h += header(slug)
-    h += phero([("Tratamentos", "tratamentos.html"), (t["nome"], None)], t["tag"], d["h1"], d["lead"])
+    h += phero([("Tratamentos", "tratamentos.html"), (t["nome"], None)], t["nome"] + " em Blumenau", d["h1"], d["lead"])
 
     intro = "".join('<p class="reveal mt-5" data-d="' + str(min(i + 1, 3)) + '">' + p + '</p>'
                     for i, p in enumerate(d["intro_p"]))
@@ -895,7 +895,7 @@ def build_treatment(slug):
 # CONTATO
 # ==========================================================================
 def build_contato():
-    sch = S.tags(S.ORG, S.breadcrumb([("Contato", "contato.html")]))
+    sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.breadcrumb([("Contato", "contato.html")]))
     h = head("Contato e Agendamento | Instituto Correr, Blumenau/SC",
              "Agende sua avaliação no Instituto Correr em Blumenau/SC. WhatsApp (47) 3222-3565, seg. a sex. das 7h às 12h e das 13h às 20h. Rua Frederico Busch Júnior, 101.",
              SITE + "/contato.html", sch)
@@ -992,9 +992,11 @@ def build_aux():
     pages = ["", "sobre.html", "metodo.html", "equipe.html", "tratamentos.html", "contato.html"] + \
             [t["slug"] + ".html" for t in TREATMENTS]
     prio = {"": "1.0", "tratamentos.html": "0.9", "contato.html": "0.9"}
+    today = S.BUILD_DATE
     urls = ""
     for p in pages:
         urls += ('  <url><loc>' + SITE + '/' + p + '</loc>'
+                 '<lastmod>' + today + '</lastmod>'
                  '<changefreq>monthly</changefreq>'
                  '<priority>' + prio.get(p, "0.8") + '</priority></url>\n')
     sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1003,11 +1005,23 @@ def build_aux():
     # O deploy publica a raiz do repositorio (vercel.json -> outputDirectory "."),
     # entao o gerador e os arquivos de apoio ficam alcancaveis pelo dominio.
     # Nao ha segredo neles, mas tambem nao devem ser indexados.
-    robots = ["User-agent: *", "Allow: /"]
-    for p in ["/build/", "/tools/", "/AGENTS.md", "/COMECE-AQUI.md", "/LEIA-ME.md", "/package.json"]:
-        robots.append("Disallow: " + p)
-    robots += ["", "Sitemap: " + SITE + "/sitemap.xml", ""]
+    blocked = ["/build/", "/tools/", "/AGENTS.md", "/COMECE-AQUI.md", "/LEIA-ME.md", "/package.json"]
+    robots = ["# Instituto Correr: fisioterapia, quiropraxia e pilates em Blumenau/SC",
+              "# Resumo para assistentes de IA: " + SITE + "/llms.txt", ""]
+    # Buscadores e assistentes de IA liberados de forma explicita. Ser citado
+    # pelo ChatGPT, Perplexity, Gemini e Claude depende de eles poderem ler o site.
+    ai_bots = ["Googlebot", "Bingbot", "OAI-SearchBot", "ChatGPT-User", "GPTBot",
+               "PerplexityBot", "Perplexity-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
+               "Google-Extended", "Applebot", "Applebot-Extended", "meta-externalagent", "DuckAssistBot"]
+    for bot in ai_bots + ["*"]:
+        robots.append("User-agent: " + bot)
+        robots.append("Allow: /")
+        for b in blocked:
+            robots.append("Disallow: " + b)
+        robots.append("")
+    robots += ["Sitemap: " + SITE + "/sitemap.xml", ""]
     write("robots.txt", "\n".join(robots))
+    write("llms.txt", build_llms())
 
     fav = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
            '<rect width="100" height="100" rx="26" fill="#232F1B"/>'
@@ -1018,6 +1032,64 @@ def build_aux():
     with open(os.path.join(OUT, "assets/img/favicon.svg"), "w", encoding="utf-8") as f:
         f.write(fav)
     print("  ✓ assets/img/favicon.svg")
+
+
+# ==========================================================================
+# llms.txt: resumo em Markdown para ChatGPT, Perplexity, Claude e afins
+# ==========================================================================
+def _txt(html):
+    import re
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html)).strip()
+
+
+def build_llms():
+    L = ["# " + NAME, "",
+         "> Clínica de fisioterapia, quiropraxia, pilates, liberação miofascial e terapias manuais "
+         "em " + CITY + "/" + STATE + ". Atendimento particular, com avaliação detalhada "
+         "antes de qualquer conduta e plano de tratamento individualizado para prevenção, "
+         "reabilitação e performance.", "",
+         "## Dados da clínica", "",
+         "- Nome: " + NAME,
+         "- Endereço: " + ADDRESS_FULL,
+         "- Telefone e WhatsApp: " + PHONE_DISPLAY + " (https://wa.me/" + WA + ")",
+         "- E-mail: " + EMAIL,
+         "- Horário: " + HOURS + ". Sábados, domingos e feriados: fechado.",
+         "- Agendamento: direto pelo WhatsApp, sem necessidade de pedido médico.",
+         "- Pagamento: atendimento particular, com recibo para reembolso do plano de saúde.",
+         "- Atende pacientes de Blumenau, Gaspar, Indaial, Timbó e Pomerode.",
+         "- Responsável técnico: Roger Levi Andrade, fisioterapeuta, CREFITO 175512.",
+         "- Instagram: " + INSTAGRAM,
+         "- Site: " + SITE + "/", "",
+         "## Tratamentos", ""]
+    for t in TREATMENTS:
+        L.append("- [" + t["nome"] + " em Blumenau](" + SITE + "/" + t["slug"] + ".html): "
+                 + t["curto"] + " Foco: " + "; ".join(t["bullets"]).lower() + ".")
+    L += ["", "## Equipe", ""]
+    for m in TEAM:
+        L.append("- " + m["nome"] + ", " + m["role"].replace(" · ", ", ")
+                 + (" (" + m["reg"] + ")" if m["reg"] else "") + ": " + m["bio"])
+    L += ["", "## Como funciona o atendimento", "",
+          "1. Avaliação detalhada: história, exame físico e funcional, testes de movimento.",
+          "2. Diagnóstico funcional explicado ao paciente, com a causa provável da queixa.",
+          "3. Plano de tratamento com técnicas, frequência e prazo definidos antes de começar.",
+          "4. Reavaliações periódicas. Não há pacote fechado vendido antes da avaliação.",
+          "5. Alta quando o paciente volta às atividades, com orientação para prevenir recidiva.", "",
+          "## Perguntas frequentes", ""]
+    seen = set()
+    for q, a in FAQ_HOME + [x for t in TREATMENTS for x in TDATA[t["slug"]]["faq"]]:
+        if q in seen:
+            continue
+        seen.add(q)
+        L += ["### " + _txt(q), "", _txt(a), ""]
+    L += ["## Páginas", "",
+          "- [Início](" + SITE + "/)",
+          "- [Sobre o Instituto](" + SITE + "/sobre.html)",
+          "- [Nosso método](" + SITE + "/metodo.html)",
+          "- [Equipe](" + SITE + "/equipe.html)",
+          "- [Todos os tratamentos](" + SITE + "/tratamentos.html)",
+          "- [Contato e agendamento](" + SITE + "/contato.html)", "",
+          "Conteúdo informativo. Não substitui avaliação individual por um profissional de saúde.", ""]
+    return "\n".join(L)
 
 
 # ==========================================================================

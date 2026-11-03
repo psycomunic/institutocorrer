@@ -1,5 +1,369 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": ".",
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/sobre-nos",
+      "destination": "/sobre.html",
+      "permanent": true
+    },
+    {
+      "source": "/sobre-nos/",
+      "destination": "/sobre.html",
+      "permanent": true
+    },
+    {
+      "source": "/sobre",
+      "destination": "/sobre.html",
+      "permanent": true
+    },
+    {
+      "source": "/sobre/",
+      "destination": "/sobre.html",
+      "permanent": true
+    },
+    {
+      "source": "/quem-somos",
+      "destination": "/sobre.html",
+      "permanent": true
+    },
+    {
+      "source": "/quem-somos/",
+      "destination": "/sobre.html",
+      "permanent": true
+    },
+    {
+      "source": "/nosso-metodo",
+      "destination": "/metodo.html",
+      "permanent": true
+    },
+    {
+      "source": "/nosso-metodo/",
+      "destination": "/metodo.html",
+      "permanent": true
+    },
+    {
+      "source": "/metodo",
+      "destination": "/metodo.html",
+      "permanent": true
+    },
+    {
+      "source": "/metodo/",
+      "destination": "/metodo.html",
+      "permanent": true
+    },
+    {
+      "source": "/equipe",
+      "destination": "/equipe.html",
+      "permanent": true
+    },
+    {
+      "source": "/equipe/",
+      "destination": "/equipe.html",
+      "permanent": true
+    },
+    {
+      "source": "/tratamentos",
+      "destination": "/tratamentos.html",
+      "permanent": true
+    },
+    {
+      "source": "/tratamentos/",
+      "destination": "/tratamentos.html",
+      "permanent": true
+    },
+    {
+      "source": "/servicos",
+      "destination": "/tratamentos.html",
+      "permanent": true
+    },
+    {
+      "source": "/servicos/",
+      "destination": "/tratamentos.html",
+      "permanent": true
+    },
+    {
+      "source": "/contato",
+      "destination": "/contato.html",
+      "permanent": true
+    },
+    {
+      "source": "/contato/",
+      "destination": "/contato.html",
+      "permanent": true
+    },
+    {
+      "source": "/contato/obrigado",
+      "destination": "/contato.html",
+      "permanent": true
+    },
+    {
+      "source": "/contato/obrigado/",
+      "destination": "/contato.html",
+      "permanent": true
+    },
+    {
+      "source": "/fisioterapia",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/fisioterapia/",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/fisioterapia-blumenau",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/fisioterapia-blumenau/",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/fisio-home",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/fisio-home/",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/lpfisio",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/lpfisio/",
+      "destination": "/fisioterapia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiropraxia",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiropraxia/",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiropraxia-blumenau",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiropraxia-blumenau/",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiro-home",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiro-home/",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiropraxia-errata",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/quiropraxia-errata/",
+      "destination": "/quiropraxia.html",
+      "permanent": true
+    },
+    {
+      "source": "/pilates",
+      "destination": "/pilates.html",
+      "permanent": true
+    },
+    {
+      "source": "/pilates/",
+      "destination": "/pilates.html",
+      "permanent": true
+    },
+    {
+      "source": "/pilates-blumenau",
+      "destination": "/pilates.html",
+      "permanent": true
+    },
+    {
+      "source": "/pilates-blumenau/",
+      "destination": "/pilates.html",
+      "permanent": true
+    },
+    {
+      "source": "/liberacao-miofascial",
+      "destination": "/liberacao-miofascial.html",
+      "permanent": true
+    },
+    {
+      "source": "/liberacao-miofascial/",
+      "destination": "/liberacao-miofascial.html",
+      "permanent": true
+    },
+    {
+      "source": "/terapias-manuais",
+      "destination": "/terapias-manuais.html",
+      "permanent": true
+    },
+    {
+      "source": "/terapias-manuais/",
+      "destination": "/terapias-manuais.html",
+      "permanent": true
+    },
+    {
+      "source": "/lp",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/lp/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/post-:n(\\d+)",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/post-:n(\\d+)/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/category/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/author/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/feed",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/feed/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/comments/feed",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/comments/feed/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/wp-admin/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/wp-login.php",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/llms.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/build/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/tools/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/(AGENTS|COMECE-AQUI|LEIA-ME)\\.md",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/package.json",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/404.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ]
 }
