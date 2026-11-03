@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Instituto Correr: dados e partials compartilhados."""
 
+import json
 import os
 
 # Domínio oficial. O antigo institutocorrer.com.br (WordPress) deve redirecionar para cá.
@@ -44,9 +45,30 @@ GEO = (-26.9313, -49.0552)
 # Os cliques em WhatsApp, telefone e e-mail e o envio do formulário viram
 # eventos (ver assets/js/main.js): "whatsapp_click", "phone_click",
 # "email_click" e "generate_lead". No Meta Pixel saem como "Contact"/"Lead".
-GTM_ID = os.environ.get("GTM_ID", "")
-GTAG_IDS = [x.strip() for x in os.environ.get("GTAG_IDS", "").split(",") if x.strip()]
-META_PIXEL_ID = os.environ.get("META_PIXEL_ID", "")
+#
+# IDs públicos (aparecem no código de qualquer site), então podem ficar aqui.
+GTM_ID = os.environ.get("GTM_ID") or ""
+GTAG_IDS = [x.strip() for x in (os.environ.get("GTAG_IDS") or "").split(",") if x.strip()]
+META_PIXEL_ID = os.environ.get("META_PIXEL_ID") or ""
+
+# Conversões do Google Ads: evento do site -> "AW-XXXXXXXXX/rotulo".
+# Rótulo em: Metas > Conversões > (ação) > Configuração da tag >
+# "Instalar a tag você mesmo" > valor de send_to.
+# A env ADS_CONVERSIONS="whatsapp_click=AW-1/abc,phone_click=AW-1/def" sobrescreve.
+ADS_CONVERSIONS = {
+    "whatsapp_click": "",   # [R] Contato WhatsApp
+    "phone_click": "",      # clique no telefone do site
+    "generate_lead": "",    # formulário de agendamento (Contato Expad)
+}
+for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
+    if "=" in _pair:
+        _k, _v = _pair.split("=", 1)
+        ADS_CONVERSIONS[_k.strip()] = _v.strip()
+ADS_CONVERSIONS = {k: v for k, v in ADS_CONVERSIONS.items() if v}
+# O gtag precisa do ID AW- carregado para as conversões funcionarem.
+for _aw in sorted({v.split("/")[0] for v in ADS_CONVERSIONS.values()}):
+    if _aw not in GTAG_IDS:
+        GTAG_IDS.append(_aw)
 
 
 def tracking_head():
@@ -60,7 +82,11 @@ def tracking_head():
         out += ('<script async src="https://www.googletagmanager.com/gtag/js?id=' + GTAG_IDS[0] + '"></script>\n'
                 "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
                 "gtag('js',new Date());"
-                + "".join("gtag('config','" + i + "');" for i in GTAG_IDS) + "</script>\n")
+                + "".join("gtag('config','" + i + "'"
+                          + (",{allow_enhanced_conversions:true}" if i.startswith("AW-") else "")
+                          + ");" for i in GTAG_IDS) + "</script>\n")
+    if ADS_CONVERSIONS:
+        out += "<script>window.__adsConv=" + json.dumps(ADS_CONVERSIONS) + ";</script>\n"
     if META_PIXEL_ID:
         out += ("<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?"
                 "n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;"

@@ -146,10 +146,19 @@
   function track(name, params) {
     params = params || {};
     params.page_path = location.pathname;
+    var phone = params.user_phone;
+    delete params.user_phone; // dado pessoal: só vai para o Google Ads (hash automático)
     try {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push(Object.assign({ event: name }, params));
-      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', name, params);
+        var conv = window.__adsConv && window.__adsConv[name];
+        if (conv) {
+          if (phone) window.gtag('set', 'user_data', { phone_number: phone });
+          window.gtag('event', 'conversion', { send_to: conv, value: 1.0, currency: 'BRL' });
+        }
+      }
       if (typeof window.fbq === 'function') {
         window.fbq('track', name === 'generate_lead' ? 'Lead' : 'Contact', params);
       }
@@ -175,7 +184,13 @@
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      track('generate_lead', { form_name: 'agendamento', service: String(new FormData(form).get('servico') || '') });
+      var digits = String(new FormData(form).get('telefone') || '').replace(/\D/g, '');
+      if (digits && digits.indexOf('55') !== 0) digits = '55' + digits;
+      track('generate_lead', {
+        form_name: 'agendamento',
+        service: String(new FormData(form).get('servico') || ''),
+        user_phone: digits.length >= 12 ? '+' + digits : undefined
+      });
       var f = new FormData(form);
       var msg =
         'Olá, Instituto Correr! Gostaria de agendar uma avaliação.\n\n' +
