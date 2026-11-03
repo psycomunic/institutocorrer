@@ -56,7 +56,7 @@ META_PIXEL_ID = os.environ.get("META_PIXEL_ID") or ""
 # "Instalar a tag você mesmo" > valor de send_to.
 # A env ADS_CONVERSIONS="whatsapp_click=AW-1/abc,phone_click=AW-1/def" sobrescreve.
 ADS_CONVERSIONS = {
-    "whatsapp_click": "",   # [R] Contato WhatsApp
+    "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB",   # [R] Contato WhatsApp
     "phone_click": "",      # clique no telefone do site
     "generate_lead": "",    # formulário de agendamento (Contato Expad)
 }
