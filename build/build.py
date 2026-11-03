@@ -152,6 +152,18 @@ def build_home():
   </div>
 </section>
 
+<!-- ===== VÍDEO EM DESTAQUE ===== -->
+<section class="section section--sand">
+  <div class="container container--narrow">
+    <div class="sec-head sec-head--center">
+      <span class="eyebrow eyebrow--center reveal">Em vídeo</span>
+      <h2 class="reveal" data-d="1">Conheça o Instituto por dentro</h2>
+      <p class="reveal" data-d="2">Uma volta pela estrutura e pelo clima do atendimento em Blumenau.</p>
+    </div>
+    <div class="mt-8">@@VIDEO@@</div>
+  </div>
+</section>
+
 <!-- ===== PROBLEMA / DIFERENCIAL ===== -->
 <section class="section">
   <div class="container">
