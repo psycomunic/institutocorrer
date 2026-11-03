@@ -57,8 +57,8 @@ META_PIXEL_ID = os.environ.get("META_PIXEL_ID") or ""
 # A env ADS_CONVERSIONS="whatsapp_click=AW-1/abc,phone_click=AW-1/def" sobrescreve.
 ADS_CONVERSIONS = {
     "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB",   # [R] Contato WhatsApp
-    "phone_click": "",      # clique no telefone do site
-    "generate_lead": "",    # formulário de agendamento (Contato Expad)
+    "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB",      # Contato Expad (clique no telefone)
+    "generate_lead": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB",    # Contato Expad (formulário de agendamento)
 }
 for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
     if "=" in _pair:
