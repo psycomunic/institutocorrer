@@ -112,11 +112,6 @@ precisa ser alterado.
 domínio de produção da Vercel. Quem manda é o build que roda no deploy.
 
 Equipe fica em `build/build.py` → lista `TEAM`.
-
-As páginas de tratamento são o destino dos anúncios. O topo delas é o `lhero()` em
-`partials.py`, com foto de `THERO` em `build.py` (`assets/img/hero-<slug>.webp`, 1280x720,
-geradas por IA). O segundo campo de `THERO` é a posição horizontal das pessoas na foto, usada
-no recorte do celular. Trocando por foto real da clínica, mantenha 16:9 e ajuste esse valor.
 Conteúdo das páginas de tratamento fica em `build/build.py` → dict `TDATA`.
 
 ## Design tokens

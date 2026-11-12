@@ -456,42 +456,6 @@ def phero(crumbs, eyebrow, h1, lead):
 """.replace("@@C@@", c).replace("@@E@@", eyebrow).replace("@@H@@", h1).replace("@@L@@", lead)
 
 
-def lhero(crumbs, eyebrow, h1, lead, img, alt, focus, wa_href):
-    """Topo das páginas de tratamento, que recebem o tráfego dos anúncios.
-    Desktop: foto cheia com o texto à esquerda. Celular: a foto vira uma faixa
-    no topo e o texto entra logo abaixo, com os dois botões ainda na primeira
-    tela. `focus` é a posição horizontal das pessoas na foto (ex.: "75%"),
-    usada no recorte do celular."""
-    c = '<a href="index.html">Início</a>'
-    for label, href in crumbs:
-        c += IC["chevr"]
-        c += ('<a href="' + href + '">' + label + '</a>') if href else ('<span>' + label + '</span>')
-    trust = "".join('<li>' + IC["check"] + '<span>' + x + '</span></li>' for x in (
-        "Avaliação detalhada antes de tratar",
-        "Plano individualizado",
-        "Centro de Blumenau, seg. a sex. até as 20h"))
-    return """
-<section class="lhero">
-  <div class="lhero__media"><img src="assets/img/@@IMG@@" alt="@@ALT@@" width="1280" height="720" fetchpriority="high" style="--fx:@@FX@@"></div>
-  <div class="container lhero__inner">
-    <div class="lhero__copy">
-      <nav class="crumbs" aria-label="Você está aqui">@@C@@</nav>
-      <span class="eyebrow">@@E@@</span>
-      <h1>@@H@@</h1>
-      <p class="lead">@@L@@</p>
-      <div class="btn-row">
-        <a class="btn btn--primary btn--lg" href="@@WAH@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
-        <a class="btn btn--light btn--lg" href="tel:@@TEL@@">@@ICPH@@ Ligar @@PH@@</a>
-      </div>
-      <ul class="lhero__trust">@@T@@</ul>
-    </div>
-  </div>
-</section>
-""".replace("@@C@@", c).replace("@@E@@", eyebrow).replace("@@H@@", h1).replace("@@L@@", lead)\
-   .replace("@@IMG@@", img).replace("@@ALT@@", alt).replace("@@FX@@", focus).replace("@@T@@", trust)\
-   .replace("@@WAH@@", wa_href)
-
-
 def acc(items, klass=""):
     out = '<div class="acc ' + klass + '">'
     for i, (q, a) in enumerate(items):

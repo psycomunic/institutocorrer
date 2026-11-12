@@ -786,36 +786,16 @@ TIMG = {
 }
 
 
-# Banner do topo (gerado por IA, 1280x720). O terceiro campo é onde estão as
-# pessoas na foto, na horizontal: o celular recorta a imagem em torno disso.
-THERO = {
-"fisioterapia": ("hero-fisioterapia.webp", "75%",
-  "Fisioterapeuta conduzindo um exercício de perna com uma paciente deitada na maca"),
-"quiropraxia": ("hero-quiropraxia.webp", "80%",
-  "Quiropraxista com as mãos nas costas de um paciente deitado de bruços"),
-"pilates": ("hero-pilates.webp", "82%",
-  "Instrutor ajustando a postura de uma aluna no aparelho de pilates"),
-"liberacao-miofascial": ("hero-liberacao-miofascial.webp", "84%",
-  "Terapeuta pressionando a musculatura do ombro de uma paciente sentada na maca"),
-"terapias-manuais": ("hero-terapias-manuais.webp", "74%",
-  "Fisioterapeuta mobilizando o braço de um paciente deitado na maca"),
-}
-
-
 def build_treatment(slug):
     t = TMAP[slug]
     d = TDATA[slug]
     img_file, img_w, img_h, img_alt = TIMG[slug]
-    hero_img, hero_fx, hero_alt = THERO[slug]
     sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.service(t, img_file, d["desc"]),
                  S.breadcrumb([("Tratamentos", "tratamentos.html"), (t["nome"], slug + ".html")]),
                  S.faq(d["faq"]))
-    h = head(d["title"], d["desc"], SITE + "/" + slug + ".html", sch,
-             preload="assets/img/" + hero_img, page_img=hero_img)
-    h += header(slug, overlay=True)
-    h += lhero([("Tratamentos", "tratamentos.html"), (t["nome"], None)], t["nome"] + " em Blumenau",
-               d["h1"], d["lead"], hero_img, hero_alt, hero_fx,
-               wa_link("Olá! Gostaria de agendar uma avaliação para " + t["nome"] + " no Instituto Correr."))
+    h = head(d["title"], d["desc"], SITE + "/" + slug + ".html", sch, page_img=img_file)
+    h += header(slug)
+    h += phero([("Tratamentos", "tratamentos.html"), (t["nome"], None)], t["nome"] + " em Blumenau", d["h1"], d["lead"])
 
     intro = "".join('<p class="reveal mt-5" data-d="' + str(min(i + 1, 3)) + '">' + p + '</p>'
                     for i, p in enumerate(d["intro_p"]))
