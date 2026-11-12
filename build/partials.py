@@ -61,7 +61,9 @@ ADS_CONVERSIONS = {
     "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",   # [R] Contato WhatsApp
     "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",      # Contato Expad (clique no telefone)
     "generate_lead": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",    # Contato Expad (formulário de agendamento)
-    "page_view": "AW-370581648/pb2OCLy5lrcZEJDB2rAB",    # [R] Visualização de Página (secundária no Ads), dispara ao abrir qualquer página
+    # [R] Visualização de Página e [R] Visualização de Página [Blumenau] (secundárias no Ads),
+    # disparam ao abrir qualquer página
+    "page_view": "AW-370581648/pb2OCLy5lrcZEJDB2rAB|AW-370581648/LdqGCPf1u74ZEJDB2rAB",
 }
 for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
     if "=" in _pair:
