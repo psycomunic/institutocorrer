@@ -52,13 +52,15 @@ GTAG_IDS = [x.strip() for x in (os.environ.get("GTAG_IDS") or "").split(",") if 
 META_PIXEL_ID = os.environ.get("META_PIXEL_ID") or ""
 
 # Conversões do Google Ads: evento do site -> "AW-XXXXXXXXX/rotulo".
+# [R] Contato [Blumenau] (AW-370581648/-3qLCPi5tb4ZEJDB2rAB) é a principal, com histórico
+# desde 2021, e recebe todo contato. As demais ficam como secundárias no Ads.
 # Rótulo em: Metas > Conversões > (ação) > Configuração da tag >
 # "Instalar a tag você mesmo" > valor de send_to.
 # A env ADS_CONVERSIONS="whatsapp_click=AW-1/abc,phone_click=AW-1/def" sobrescreve.
 ADS_CONVERSIONS = {
-    "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB",   # [R] Contato WhatsApp
-    "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB",      # Contato Expad (clique no telefone)
-    "generate_lead": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB",    # Contato Expad (formulário de agendamento)
+    "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",   # [R] Contato WhatsApp
+    "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",      # Contato Expad (clique no telefone)
+    "generate_lead": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",    # Contato Expad (formulário de agendamento)
 }
 for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
     if "=" in _pair:
@@ -66,7 +68,8 @@ for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
         ADS_CONVERSIONS[_k.strip()] = _v.strip()
 ADS_CONVERSIONS = {k: v for k, v in ADS_CONVERSIONS.items() if v}
 # O gtag precisa do ID AW- carregado para as conversões funcionarem.
-for _aw in sorted({v.split("/")[0] for v in ADS_CONVERSIONS.values()}):
+# Mais de uma ação para o mesmo evento: separe os send_to com "|".
+for _aw in sorted({s.split("/")[0] for v in ADS_CONVERSIONS.values() for s in v.split("|")}):
     if _aw not in GTAG_IDS:
         GTAG_IDS.append(_aw)
 

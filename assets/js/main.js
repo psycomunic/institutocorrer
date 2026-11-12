@@ -156,7 +156,9 @@
         var conv = window.__adsConv && window.__adsConv[name];
         if (conv) {
           if (phone) window.gtag('set', 'user_data', { phone_number: phone });
-          window.gtag('event', 'conversion', { send_to: conv, value: 1.0, currency: 'BRL' });
+          conv.split('|').forEach(function (id) {
+            window.gtag('event', 'conversion', { send_to: id, value: 1.0, currency: 'BRL' });
+          });
         }
       }
       if (typeof window.fbq === 'function') {
