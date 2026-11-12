@@ -408,6 +408,68 @@ body.no-scroll { overflow: hidden; }
 .phero h1 { margin-top: .85rem; font-size: clamp(2.1rem, 4.4vw, 3.25rem); }
 .phero .lead { margin-top: 1.15rem; }
 
+/* ---------- 9c. Hero das páginas de tratamento (destino dos anúncios) ----------
+   Desktop: foto cheia, texto à esquerda sobre o escurecimento diagonal.
+   Celular: a foto vira faixa no topo e o texto entra por cima da base dela,
+   para os dois botões caberem na primeira tela. */
+.lhero {
+  position: relative; overflow: hidden; display: flex; align-items: stretch;
+  min-height: clamp(600px, 50vw, 760px);
+  background: var(--forest-900); color: #fff;
+}
+.lhero__media { position: absolute; inset: 0; }
+.lhero__media img { width: 100%; height: 100%; object-fit: cover; object-position: var(--fx, 70%) center; }
+.lhero__media::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(100deg, rgba(20,28,15,.95) 0%, rgba(20,28,15,.86) 32%, rgba(20,28,15,.44) 58%, rgba(20,28,15,.08) 80%),
+    linear-gradient(to bottom, rgba(20,28,15,.55) 0%, rgba(20,28,15,0) 24%);
+}
+.lhero__inner {
+  position: relative; z-index: 1; display: flex; align-items: center;
+  padding-top: calc(var(--nav-h) + clamp(2rem, 4vw, 3rem));
+  padding-bottom: clamp(2.5rem, 4vw, 3.5rem);
+}
+.lhero__copy { max-width: 37rem; }
+.lhero .crumbs, .lhero .crumbs a { color: rgba(255,255,255,.72); }
+.lhero .crumbs a:hover { color: #fff; }
+.lhero .crumbs span { color: #fff; }
+.lhero .crumbs svg { opacity: .7; }
+.lhero .eyebrow { color: var(--forest-200); margin-top: 1.25rem; }
+.lhero h1 { color: #fff; margin-top: .8rem; font-size: clamp(2.15rem, 4.3vw, 3.3rem); }
+.lhero .lead { color: rgba(255,255,255,.85); margin-top: 1rem; max-width: 33rem; font-size: clamp(1.02rem, 1.3vw, 1.14rem); }
+.lhero .btn-row { margin-top: 1.75rem; }
+.lhero__trust {
+  list-style: none; margin: 1.6rem 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: .6rem 1.4rem;
+  font-size: .9rem; color: rgba(255,255,255,.88);
+}
+.lhero__trust li { display: flex; align-items: center; gap: .5rem; }
+.lhero__trust svg { width: 18px; height: 18px; flex: none; color: var(--forest-200); }
+
+@media (max-width: 940px) {
+  /* Texto ocupa quase toda a largura: o escurecimento fica mais uniforme. */
+  .lhero__media::after {
+    background:
+      linear-gradient(90deg, rgba(20,28,15,.93) 0%, rgba(20,28,15,.78) 55%, rgba(20,28,15,.5) 100%),
+      linear-gradient(to bottom, rgba(20,28,15,.55) 0%, rgba(20,28,15,0) 24%);
+  }
+}
+@media (max-width: 640px) {
+  .lhero { display: block; min-height: 0; }
+  .lhero__media { position: relative; inset: auto; aspect-ratio: 5 / 4.3; }
+  .lhero__media::after {
+    background: linear-gradient(to bottom,
+      rgba(20,28,15,.6) 0%, rgba(20,28,15,0) 28%, rgba(20,28,15,0) 52%, rgba(27,36,21,1) 100%);
+  }
+  .lhero__inner { padding-top: 0; margin-top: -3.5rem; padding-bottom: 2.75rem; }
+  .lhero .crumbs { display: none; }
+  .lhero .eyebrow { margin-top: 0; }
+  .lhero h1 { font-size: 2.05rem; }
+  .lhero .btn-row { margin-top: 1.5rem; }
+  .lhero__trust { flex-direction: column; gap: .6rem; margin-top: 1.5rem; }
+}
+
 /* Migalhas */
 .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; font-size: .82rem; color: var(--ink-dim); }
 .crumbs a:hover { color: var(--forest-600); }
