@@ -3,6 +3,16 @@
 
 import json
 import os
+import hashlib
+
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _ver(rel):
+    """Hash curto do arquivo. Vai na URL do CSS/JS para o navegador baixar a
+    versao nova assim que ela muda (o cache dos assets e de uma semana)."""
+    with open(os.path.join(_ROOT, rel), "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()[:8]
 
 # Domínio oficial. O antigo institutocorrer.com.br (WordPress) deve redirecionar para cá.
 SITE_FINAL = "https://institutocorrerblumenau.com"
@@ -278,12 +288,12 @@ def head(title, desc, canonical, schema_extra="", og_type="website", preload="",
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&family=Inter:wght@400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css?v=@@VCSS@@">
 @@SCHEMA@@
 </head>
 <body>
 @@TRACKB@@<a class="skip-link" href="#main">Pular para o conteúdo</a>
-""".replace("@@PRELOAD@@", pre).replace("@@TRACKB@@", tracking_body())\
+""".replace("@@VCSS@@", _ver("assets/css/style.css")).replace("@@PRELOAD@@", pre).replace("@@TRACKB@@", tracking_body())\
    .replace("@@TRACK@@", tracking_head())\
    .replace("@@GEOP@@", "%s;%s" % GEO).replace("@@GEOI@@", "%s, %s" % GEO)\
    .replace("@@TITLE@@", title).replace("@@DESC@@", desc)\
@@ -425,10 +435,10 @@ def footer():
   @@WAI@@<span>Agendar pelo WhatsApp</span>
 </a>
 
-<script src="assets/js/main.js" defer></script>
+<script src="assets/js/main.js?v=@@VJS@@" defer></script>
 </body>
 </html>
-""".replace("@@TR@@", tr).replace("@@IG@@", IC["instagram"]).replace("@@FB@@", IC["facebook"])\
+""".replace("@@VJS@@", _ver("assets/js/main.js")).replace("@@TR@@", tr).replace("@@IG@@", IC["instagram"]).replace("@@FB@@", IC["facebook"])\
    .replace("@@IGURL@@", INSTAGRAM).replace("@@FBURL@@", FACEBOOK)\
    .replace("@@WAI@@", IC["whatsapp"]).replace("@@WA@@", wa_link())\
    .replace("@@TEL@@", PHONE_TEL).replace("@@PH@@", PHONE_DISPLAY).replace("@@EMAIL@@", EMAIL)\

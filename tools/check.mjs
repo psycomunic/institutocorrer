@@ -64,7 +64,7 @@ for (const page of pages) {
   for (const m of html.matchAll(/href="([^"]+)"/g)) {
     const href = m[1];
     if (/^(https?:|mailto:|tel:|#|data:)/.test(href)) continue;
-    const [path] = href.split('#');
+    const [path] = href.split('#')[0].split('?');
     if (!path) continue;
     if (!existsSync(join(ROOT, path))) P(page, `link quebrado: ${href}`);
   }
