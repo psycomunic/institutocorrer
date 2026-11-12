@@ -61,6 +61,7 @@ ADS_CONVERSIONS = {
     "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",   # [R] Contato WhatsApp
     "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",      # Contato Expad (clique no telefone)
     "generate_lead": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",    # Contato Expad (formulário de agendamento)
+    "page_view": "AW-370581648/pb2OCLy5lrcZEJDB2rAB",    # [R] Visualização de Página (secundária no Ads), dispara ao abrir qualquer página
 }
 for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
     if "=" in _pair:
@@ -87,7 +88,10 @@ def tracking_head():
                 "gtag('js',new Date());"
                 + "".join("gtag('config','" + i + "'"
                           + (",{allow_enhanced_conversions:true}" if i.startswith("AW-") else "")
-                          + ");" for i in GTAG_IDS) + "</script>\n")
+                          + ");" for i in GTAG_IDS)
+                + "".join("gtag('event','conversion',{send_to:'" + s + "'});"
+                          for s in ADS_CONVERSIONS.get("page_view", "").split("|") if s)
+                + "</script>\n")
     if ADS_CONVERSIONS:
         out += "<script>window.__adsConv=" + json.dumps(ADS_CONVERSIONS) + ";</script>\n"
     if META_PIXEL_ID:
