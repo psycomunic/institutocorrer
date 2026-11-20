@@ -14,16 +14,10 @@ def _ver(rel):
     with open(os.path.join(_ROOT, rel), "rb") as f:
         return hashlib.md5(f.read()).hexdigest()[:8]
 
+
 # Domínio oficial. O antigo institutocorrer.com.br (WordPress) deve redirecionar para cá.
 SITE_FINAL = "https://institutocorrerblumenau.com"
 
-# og:image, og:url, canonical e sitemap exigem URL absoluta. Enquanto o
-# domínio próprio ainda serve o site antigo, apontar para ele faz o robô do
-# WhatsApp e do Facebook buscarem a imagem lá, receberem 404 e mostrarem o
-# preview sem banner. Então o build usa o domínio onde o site está de fato
-# publicado. Na Vercel isso vem pronto em VERCEL_PROJECT_PRODUCTION_URL, que
-# passa a ser o domínio próprio assim que ele for adicionado ao projeto.
-# Nada disso muda o build local, que continua usando o domínio final.
 SITE = (os.environ.get("SITE_URL")
         or ("https://" + os.environ["VERCEL_PROJECT_PRODUCTION_URL"]
             if os.environ.get("VERCEL_PROJECT_PRODUCTION_URL") else SITE_FINAL))
@@ -32,6 +26,7 @@ PHONE_DISPLAY = "(47) 3222-3565"
 PHONE_TEL = "+554732223565"
 WA = "554732223565"
 EMAIL = "contato@institutocorrer.com.br"
+EMAIL_USER, EMAIL_DOMAIN = EMAIL.split("@", 1)
 STREET = "Rua Frederico Busch Júnior, 101, Ed. Oswaldo Cruz"
 CITY = "Blumenau"
 STATE = "SC"
@@ -40,39 +35,23 @@ ADDRESS_FULL = STREET + ", " + CITY + "/" + STATE + ", CEP " + CEP
 HOURS = "Seg. a sex., das 7h às 12h e das 13h às 20h"
 INSTAGRAM = "https://www.instagram.com/institutocorrer/"
 FACEBOOK = "https://www.facebook.com/institutocorrer"
-# Trecho da rua com o CEP 89020-400 (OpenStreetMap). Troque pelas coordenadas
-# exatas do pin da clínica no Google Maps quando tiver o Perfil da Empresa.
 GEO = (-26.9313, -49.0552)
 
 # --------------------------------------------------------------------------
 # MEDIÇÃO DE CAMPANHAS
 # --------------------------------------------------------------------------
-# Preencha só o que for usar. Vazio = nenhum script de terceiros é carregado.
-# Também podem vir de variáveis de ambiente na Vercel, sem tocar no código.
-#   GTM_ID         "GTM-XXXXXXX"  (Google Tag Manager, recomendado)
-#   GTAG_IDS       "G-XXXXXXX,AW-XXXXXXXXX"  (GA4 e/ou Google Ads direto)
-#   META_PIXEL_ID  "123456789012345"
-# Os cliques em WhatsApp, telefone e e-mail e o envio do formulário viram
-# eventos (ver assets/js/main.js): "whatsapp_click", "phone_click",
-# "email_click" e "generate_lead". No Meta Pixel saem como "Contact"/"Lead".
-#
-# IDs públicos (aparecem no código de qualquer site), então podem ficar aqui.
 GTM_ID = os.environ.get("GTM_ID") or ""
 GTAG_IDS = [x.strip() for x in (os.environ.get("GTAG_IDS") or "").split(",") if x.strip()]
 META_PIXEL_ID = os.environ.get("META_PIXEL_ID") or ""
 
 # Conversões do Google Ads: evento do site -> "AW-XXXXXXXXX/rotulo".
-# [R] Contato [Blumenau] (AW-370581648/-3qLCPi5tb4ZEJDB2rAB) é a principal, com histórico
-# desde 2021, e recebe todo contato. As demais ficam como secundárias no Ads.
-# Rótulo em: Metas > Conversões > (ação) > Configuração da tag >
-# "Instalar a tag você mesmo" > valor de send_to.
-# A env ADS_CONVERSIONS="whatsapp_click=AW-1/abc,phone_click=AW-1/def" sobrescreve.
+# [R] Contato [Blumenau] (AW-370581648/-3qLCPi5tb4ZEJDB2rAB) é a principal.
+# [R] Contato WhatsApp (eRQKCO30mbcZEJDB2rAB), Contato Expad (qoLqCNy2lI0ZEJDB2rAB)
+# e [R] Envio de Formulário (CouoCMahmrcZEJDB2rAB) registram o canal específico.
 ADS_CONVERSIONS = {
-    "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",   # [R] Contato WhatsApp
-    "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",      # Contato Expad (clique no telefone)
-    "generate_lead": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",    # Contato Expad (formulário de agendamento)
-    # [R] Visualização de Página e [R] Visualização de Página [Blumenau] (secundárias no Ads),
-    # disparam ao abrir qualquer página
+    "whatsapp_click": "AW-370581648/eRQKCO30mbcZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",
+    "phone_click": "AW-370581648/qoLqCNy2lI0ZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",
+    "generate_lead": "AW-370581648/CouoCMahmrcZEJDB2rAB|AW-370581648/-3qLCPi5tb4ZEJDB2rAB",
     "page_view": "AW-370581648/pb2OCLy5lrcZEJDB2rAB|AW-370581648/LdqGCPf1u74ZEJDB2rAB",
 }
 for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
@@ -80,8 +59,6 @@ for _pair in (os.environ.get("ADS_CONVERSIONS") or "").split(","):
         _k, _v = _pair.split("=", 1)
         ADS_CONVERSIONS[_k.strip()] = _v.strip()
 ADS_CONVERSIONS = {k: v for k, v in ADS_CONVERSIONS.items() if v}
-# O gtag precisa do ID AW- carregado para as conversões funcionarem.
-# Mais de uma ação para o mesmo evento: separe os send_to com "|".
 for _aw in sorted({s.split("/")[0] for v in ADS_CONVERSIONS.values() for s in v.split("|")}):
     if _aw not in GTAG_IDS:
         GTAG_IDS.append(_aw)
@@ -95,15 +72,16 @@ def tracking_head():
                 "j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);"
                 "})(window,document,'script','dataLayer','" + GTM_ID + "');</script>\n")
     if GTAG_IDS:
+        pv_calls = "".join("gtag('event','conversion',{send_to:'" + s + "'});"
+                           for s in ADS_CONVERSIONS.get("page_view", "").split("|") if s)
         out += ('<script async src="https://www.googletagmanager.com/gtag/js?id=' + GTAG_IDS[0] + '"></script>\n'
                 "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
                 "gtag('js',new Date());"
+                "if(/(^|\\.)institutocorrerblumenau\\.com$/i.test(location.hostname)){"
                 + "".join("gtag('config','" + i + "'"
                           + (",{allow_enhanced_conversions:true}" if i.startswith("AW-") else "")
                           + ");" for i in GTAG_IDS)
-                + "".join("gtag('event','conversion',{send_to:'" + s + "'});"
-                          for s in ADS_CONVERSIONS.get("page_view", "").split("|") if s)
-                + "</script>\n")
+                + pv_calls + "}</script>\n")
     if ADS_CONVERSIONS:
         out += "<script>window.__adsConv=" + json.dumps(ADS_CONVERSIONS) + ";</script>\n"
     if META_PIXEL_ID:
@@ -122,9 +100,19 @@ def tracking_body():
     return ('<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' + GTM_ID
             + '" height="0" width="0" style="display:none;visibility:hidden" title="GTM"></iframe></noscript>\n')
 
+
 def wa_link(msg="Olá! Gostaria de agendar uma avaliação no Instituto Correr."):
     from urllib.parse import quote
     return "https://wa.me/" + WA + "?text=" + quote(msg)
+
+
+def email_html():
+    """Renderiza o e-mail da clínica sem expor texto literal 'usuario@dominio' no DOM,
+    evitando que a coleta automática de Conversões Otimizadas do Google Ads capture
+    o e-mail do rodapé da própria clínica como se fosse o e-mail do visitante."""
+    return ('<a href="mailto:' + EMAIL + '" aria-label="Enviar e-mail para ' + EMAIL + '">'
+            '<span class="eml" data-d="' + EMAIL_DOMAIN + '">' + EMAIL_USER + '</span></a>')
+
 
 # --------------------------------------------------------------------------
 # ÍCONES (Lucide-style, stroke)
@@ -134,6 +122,7 @@ def _svg(paths, fill=False):
         return ('<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + paths + '</svg>')
     return ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '
             'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>')
+
 
 IC = {
 "activity": _svg('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'),
@@ -175,9 +164,6 @@ IC = {
 # --------------------------------------------------------------------------
 # VÍDEO
 # --------------------------------------------------------------------------
-# O iframe do YouTube só é criado quando a pessoa clica no play. Até lá a
-# página mostra um poster local, sem nenhuma requisição a terceiros e sem
-# os cookies que o embed padrão instala em quem apenas passa pela página.
 VIDEO_METODO = dict(
     id="Ld49dnbaHvk",
     poster="video-metodo.webp",
@@ -192,10 +178,11 @@ def video(v=VIDEO_METODO):
     return ('<div class="video reveal">'
             '<button class="video__btn" type="button" data-video="' + v["id"] + '" '
             'data-title="' + v["label"] + '" aria-label="' + v["label"] + '">'
-            '<img src="assets/img/' + v["poster"] + '" alt="" width="' + str(v["poster_w"])
+            '<img src="assets/img/' + v["poster"] + '" alt="Estrutura interna do Instituto Correr em Blumenau" width="' + str(v["poster_w"])
             + '" height="' + str(v["poster_h"]) + '" loading="lazy">'
             '<span class="video__play" aria-hidden="true">' + IC["play"] + '</span>'
             '</button></div>')
+
 
 # --------------------------------------------------------------------------
 # TRATAMENTOS
@@ -231,15 +218,11 @@ NAV = [
     ("equipe.html", "Equipe"),
 ]
 
-# --------------------------------------------------------------------------
-# HEAD / HEADER / FOOTER
-# --------------------------------------------------------------------------
 PAGE_KIND = {"": "WebPage", "sobre.html": "AboutPage", "contato.html": "ContactPage",
              "equipe.html": "AboutPage", "metodo.html": "WebPage", "tratamentos.html": "CollectionPage"}
 
 
 def head(title, desc, canonical, schema_extra="", og_type="website", preload="", page_img=None):
-    # WebPage em JSON-LD para toda página indexável, a partir do mesmo title/description.
     if canonical.startswith(SITE) and not canonical.endswith("404.html"):
         import schema as _S
         path = canonical[len(SITE) + 1:]
@@ -301,9 +284,9 @@ def head(title, desc, canonical, schema_extra="", og_type="website", preload="",
    .replace("@@SCHEMA@@", schema_extra).replace("@@OGTYPE@@", og_type)
 
 
-def header(active="", overlay=False):
-    """overlay=True deixa o header transparente sobre o hero de imagem cheia,
-    trocando o logo pela versao branca ate a pagina rolar."""
+def header(active="", overlay=False, wa_msg=None):
+    """overlay=True deixa o header transparente sobre o hero escuro no topo."""
+    wh = wa_link(wa_msg) if wa_msg else wa_link()
     links = ""
     for href, label in NAV:
         cls = "nav__link is-active" if href == active else "nav__link"
@@ -342,7 +325,8 @@ def header(active="", overlay=False):
       </div>
       <a class="nav__link" href="contato.html">Contato</a>
     </nav>
-    <a class="btn btn--primary btn--sm header__cta" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
+    <a class="btn btn--wa btn--sm header__cta" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
+    <a class="btn btn--wa btn--xs header__mcta" href="@@WA@@" target="_blank" rel="noopener" aria-label="Agendar pelo WhatsApp">@@ICWA@@ <span>WhatsApp</span></a>
     <button class="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="mnav">
       <span></span><span></span><span></span>
     </button>
@@ -353,17 +337,19 @@ def header(active="", overlay=False):
   <button data-msub aria-expanded="false">Tratamentos</button>
   <div class="sub">@@MSUB@@<a href="tratamentos.html">Ver todos</a></div>
   <a href="contato.html">Contato</a>
-  <a class="btn btn--primary" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
+  <a class="btn btn--wa btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar pelo WhatsApp</a>
 </div>
 """.replace("@@OVER@@", " header--overlay" if overlay else "")\
    .replace("@@LINKS@@", links).replace("@@DROP@@", drop_items).replace("@@TRACT@@", tr_active)\
    .replace("@@MLINKS@@", m_links).replace("@@MSUB@@", m_sub)\
    .replace("@@CHEV@@", IC["chev"]).replace("@@ICARROW@@", IC["arrow"])\
-   .replace("@@ICWA@@", IC["whatsapp"]).replace("@@WA@@", wa_link())
+   .replace("@@ICWA@@", IC["whatsapp"]).replace("@@WA@@", wh)
 
 
 def cta_band(title="Sua próxima consulta pode ser o começo do fim da dor",
-             text="Agende uma avaliação completa e descubra, com clareza, o que está acontecendo com o seu corpo e qual é o caminho mais curto para você voltar a se mover sem medo."):
+             text="Agende uma avaliação completa e descubra, com clareza, o que está acontecendo com o seu corpo e qual é o caminho mais curto para você voltar a se mover sem medo.",
+             wa_msg=None):
+    wh = wa_link(wa_msg) if wa_msg else wa_link()
     return """
 <section class="section cta-band">
   <div class="container center">
@@ -371,19 +357,21 @@ def cta_band(title="Sua próxima consulta pode ser o começo do fim da dor",
     <h2 class="reveal mt-5" style="max-width:20ch;margin-inline:auto">@@T@@</h2>
     <p class="lead reveal measure mx-auto mt-5" data-d="1">@@X@@</p>
     <div class="btn-row reveal mt-8" data-d="2" style="justify-content:center">
-      <a class="btn btn--primary btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Falar no WhatsApp</a>
-      <a class="btn btn--light btn--lg" href="tel:@@TEL@@">@@ICPH@@ @@PH@@</a>
+      <a class="btn btn--wa btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Falar agora no WhatsApp</a>
+      <a class="btn btn--light btn--lg" href="tel:@@TEL@@">@@ICPH@@ Ligar @@PH@@</a>
     </div>
-    <p class="reveal mt-6" data-d="3" style="font-size:.87rem;color:rgba(255,255,255,.5)">@@HOURS@@ &nbsp;·&nbsp; @@STREET@@</p>
+    <p class="reveal mt-6" data-d="3" style="font-size:.87rem;color:rgba(255,255,255,.65)">@@HOURS@@ &nbsp;·&nbsp; @@STREET@@, @@CITY@@/@@STATE@@</p>
   </div>
 </section>
-""".replace("@@T@@", title).replace("@@X@@", text).replace("@@WA@@", wa_link())\
+""".replace("@@T@@", title).replace("@@X@@", text).replace("@@WA@@", wh)\
    .replace("@@ICWA@@", IC["whatsapp"]).replace("@@ICPH@@", IC["phone"])\
    .replace("@@TEL@@", PHONE_TEL).replace("@@PH@@", PHONE_DISPLAY)\
-   .replace("@@HOURS@@", HOURS).replace("@@STREET@@", STREET)
+   .replace("@@HOURS@@", HOURS).replace("@@STREET@@", STREET)\
+   .replace("@@CITY@@", CITY).replace("@@STATE@@", STATE)
 
 
-def footer():
+def footer(wa_msg=None, wa_bar_label="Agendar no WhatsApp"):
+    wh = wa_link(wa_msg) if wa_msg else wa_link()
     tr = ""
     for t in TREATMENTS:
         tr += '<li><a href="' + t["slug"] + '.html">' + t["nome"] + '</a></li>'
@@ -418,7 +406,7 @@ def footer():
         <h4>Atendimento</h4>
         <ul>
           <li><a href="tel:@@TEL@@">@@PH@@</a></li>
-          <li><a href="mailto:@@EMAIL@@">@@EMAIL@@</a></li>
+          <li>@@EML@@</li>
           <li style="color:rgba(255,255,255,.6)">@@HOURS@@</li>
           <li><a href="https://www.google.com/maps/search/?api=1&amp;query=@@MAPQ@@" target="_blank" rel="noopener">@@STREET@@<br>@@CITY@@/@@STATE@@, CEP @@CEP@@</a></li>
         </ul>
@@ -432,16 +420,23 @@ def footer():
 </footer>
 
 <a class="wa-float" href="@@WA@@" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <span class="wa-float__dot" aria-hidden="true"></span>
   @@WAI@@<span>Agendar pelo WhatsApp</span>
 </a>
+
+<div class="mbar" role="region" aria-label="Agendamento rápido">
+  <a class="mbar__call" href="tel:@@TEL@@" aria-label="Ligar para @@PH@@">@@ICPH@@<span>Ligar</span></a>
+  <a class="mbar__wa" href="@@WA@@" target="_blank" rel="noopener">@@WAI@@<span>@@WABAR@@</span></a>
+</div>
 
 <script src="assets/js/main.js?v=@@VJS@@" defer></script>
 </body>
 </html>
 """.replace("@@VJS@@", _ver("assets/js/main.js")).replace("@@TR@@", tr).replace("@@IG@@", IC["instagram"]).replace("@@FB@@", IC["facebook"])\
    .replace("@@IGURL@@", INSTAGRAM).replace("@@FBURL@@", FACEBOOK)\
-   .replace("@@WAI@@", IC["whatsapp"]).replace("@@WA@@", wa_link())\
-   .replace("@@TEL@@", PHONE_TEL).replace("@@PH@@", PHONE_DISPLAY).replace("@@EMAIL@@", EMAIL)\
+   .replace("@@WAI@@", IC["whatsapp"]).replace("@@ICPH@@", IC["phone"]).replace("@@WA@@", wh)\
+   .replace("@@WABAR@@", wa_bar_label)\
+   .replace("@@TEL@@", PHONE_TEL).replace("@@PH@@", PHONE_DISPLAY).replace("@@EML@@", email_html())\
    .replace("@@HOURS@@", HOURS).replace("@@STREET@@", STREET).replace("@@CITY@@", CITY)\
    .replace("@@STATE@@", STATE).replace("@@CEP@@", CEP)\
    .replace("@@MAPQ@@", "Instituto+Correr+Blumenau")
@@ -464,6 +459,152 @@ def phero(crumbs, eyebrow, h1, lead):
   </div>
 </section>
 """.replace("@@C@@", c).replace("@@E@@", eyebrow).replace("@@H@@", h1).replace("@@L@@", lead)
+
+
+def thero(crumbs, eyebrow, h1, lead, img_file, img_w, img_h, img_alt, wa_msg, cta_label="Agendar avaliação no WhatsApp"):
+    """Hero de alta conversão para as páginas de serviço (destino dos anúncios).
+    No celular entrega título, proposta de valor e botão de WhatsApp já na primeira
+    dobra, seguidos das credenciais locais e da imagem clínica."""
+    c = '<a href="index.html">Início</a>'
+    for label, href in crumbs:
+        c += IC["chevr"]
+        c += ('<a href="' + href + '">' + label + '</a>') if href else ('<span>' + label + '</span>')
+    wh = wa_link(wa_msg)
+    return """
+<section class="thero">
+  <div class="container thero__grid">
+    <div class="thero__copy">
+      <nav class="crumbs" aria-label="Você está aqui">@@C@@</nav>
+      <div class="thero__pills">
+        <span class="thero__pill"><span class="thero__dot" aria-hidden="true"></span> Blumenau · Centro / Garcia</span>
+        <span class="thero__pill">Sem pedido médico</span>
+      </div>
+      <span class="eyebrow">@@E@@</span>
+      <h1>@@H@@</h1>
+      <p class="lead">@@L@@</p>
+      <div class="thero__actions">
+        <a class="btn btn--wa btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ @@CTALBL@@</a>
+        <a class="btn btn--light btn--lg" href="#queixas">Escolher minha queixa</a>
+      </div>
+      <p class="thero__micro">@@ICCLK@@ Atendimento seg. a sex., das 7h às 12h e das 13h às 20h</p>
+      <ul class="thero__trust">
+        <li>@@ICCHK@@ <span>Avaliação física detalhada antes de definir a conduta</span></li>
+        <li>@@ICCHK@@ <span>Responsável técnico CREFITO 175512 · 10+ anos de prática</span></li>
+        <li>@@ICCHK@@ <span>Atendimento particular (emitimos recibo para reembolso)</span></li>
+      </ul>
+    </div>
+    <div class="thero__media">
+      <div class="thero__frame">
+        <img src="assets/img/@@IMG@@" alt="@@ALT@@" width="@@W@@" height="@@HG@@" fetchpriority="high">
+      </div>
+      <div class="thero__doc">
+        <img src="assets/img/roger.webp" alt="Roger Levi Andrade, fisioterapeuta responsável técnico" width="96" height="134">
+        <div>
+          <b>Roger Levi Andrade</b>
+          <span>Fisioterapeuta · CREFITO 175512</span>
+          <small>Equipe multidisciplinar no Instituto Correr</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+""".replace("@@C@@", c).replace("@@E@@", eyebrow).replace("@@H@@", h1).replace("@@L@@", lead)\
+   .replace("@@WA@@", wh).replace("@@CTALBL@@", cta_label)\
+   .replace("@@IMG@@", img_file).replace("@@ALT@@", img_alt)\
+   .replace("@@W@@", str(img_w)).replace("@@HG@@", str(img_h))\
+   .replace("@@ICWA@@", IC["whatsapp"]).replace("@@ICCLK@@", IC["clock"]).replace("@@ICCHK@@", IC["check"])
+
+
+def fast_schedule_section(selected_service="", section_cls="section section--sand"):
+    """Bloco enxuto de pré-agendamento pelo WhatsApp + autoridade clínica local.
+    Reduz a fricção de quem prefere escolher período do dia (manhã, tarde ou noite)
+    antes de abrir a conversa com a recepção."""
+    if selected_service:
+        srv_field = '<input type="hidden" name="servico" value="' + selected_service + '">'
+        form_sub = "Escolha o melhor período para você e clique em continuar: abrimos o WhatsApp já com os seus dados preenchidos para agilizar o horário."
+        form_name = "rapido_" + selected_service.lower().replace(" ", "_")
+    else:
+        opts = "".join('<option value="' + t["nome"] + '">' + t["nome"] + '</option>' for t in TREATMENTS)
+        srv_field = ('<div class="field"><label for="f-servico">Especialidade de interesse</label>'
+                     '<select id="f-servico" name="servico">'
+                     '<option value="Avaliação inicial (quero indicação)">Ainda não sei, quero uma avaliação</option>'
+                     + opts + '</select></div>')
+        form_sub = "Preencha em 20 segundos e clique em continuar: a conversa abre no WhatsApp já pronta para a nossa recepção."
+        form_name = "rapido_home"
+
+    return """
+<section class="@@SCLS@@" id="agendar">
+  <div class="container">
+    <div class="split split--form">
+      <div>
+        <span class="eyebrow reveal">Atendimento em Blumenau</span>
+        <h2 class="reveal mt-5" data-d="1">Quem cuida do seu caso e onde estamos</h2>
+        <p class="reveal mt-5" data-d="2">Você será atendido por especialistas com registro ativo, em estrutura completa com consultórios e estúdio próprio de pilates na região central de Blumenau.</p>
+        <div class="mini-team reveal mt-6" data-d="2">
+          <div class="mini-doc">
+            <img src="assets/img/roger.webp" alt="Roger Levi Andrade, fisioterapeuta" width="96" height="134" loading="lazy">
+            <div>
+              <b>Roger Levi Andrade</b>
+              <span>Fisioterapeuta · Resp. Técnico</span>
+              <small>CREFITO 175512 · 10+ anos de clínica</small>
+            </div>
+          </div>
+          <div class="mini-doc">
+            <img src="assets/img/carla.webp" alt="Carla Morgana Pintarelli, fisioterapeuta" width="96" height="134" loading="lazy">
+            <div>
+              <b>Carla Morgana Pintarelli</b>
+              <span>Fisioterapeuta · Pilates e Busquet</span>
+              <small>Formada pela FURB desde 2012</small>
+            </div>
+          </div>
+        </div>
+        <div class="loc-pills reveal mt-6" data-d="3">
+          <a class="loc-pill" href="https://www.google.com/maps/search/?api=1&amp;query=Instituto+Correr+Blumenau" target="_blank" rel="noopener">
+            @@ICMAP@@ <span><b>@@STREET@@</b><small>@@CITY@@/@@STATE@@ · Ver rota no Google Maps</small></span>
+          </a>
+          <div class="loc-pill">
+            @@ICCLK@@ <span><b>Horário estendido até as 20h</b><small>@@HOURS@@</small></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-panel reveal" data-d="1">
+        <span class="eyebrow">Resposta rápida no WhatsApp</span>
+        <h3 class="form-panel__title">Consultar horários disponíveis</h3>
+        <p class="form-panel__sub">@@FSUB@@</p>
+        <form class="form mt-5" data-wa-form="@@WANUM@@" data-form-name="@@FNAME@@">
+          @@SRVFLD@@
+          <div class="field">
+            <label for="f-nome">Seu nome <span class="req">*</span></label>
+            <input id="f-nome" name="nome" type="text" required placeholder="Como podemos chamar você?" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="f-tel">Seu WhatsApp <span class="opt">(opcional)</span></label>
+            <input id="f-tel" name="telefone" type="tel" placeholder="(47) 99999-9999" data-mask="phone" autocomplete="tel">
+          </div>
+          <fieldset class="field shift-group">
+            <legend>Qual período fica melhor para você?</legend>
+            <div class="shift-pills">
+              <label class="shift-pill"><input type="radio" name="periodo" value="Manhã (7h às 12h)" checked><span>Manhã (7h-12h)</span></label>
+              <label class="shift-pill"><input type="radio" name="periodo" value="Tarde (13h às 17h)"><span>Tarde (13h-17h)</span></label>
+              <label class="shift-pill"><input type="radio" name="periodo" value="Fim do dia (17h às 20h)"><span>Noite (17h-20h)</span></label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="f-msg">O que você está sentindo? <span class="opt">(opcional)</span></label>
+            <input id="f-msg" name="mensagem" type="text" placeholder="Ex.: dor na lombar há 2 semanas, ciático, ombro...">
+          </div>
+          <button class="btn btn--wa btn--lg" type="submit" style="width:100%">@@ICWA@@ Continuar no WhatsApp</button>
+          <p class="form__note">Sem compromisso e sem fila: você fala direto com a nossa recepção em Blumenau.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+""".replace("@@SCLS@@", section_cls).replace("@@FSUB@@", form_sub)\
+   .replace("@@WANUM@@", WA).replace("@@FNAME@@", form_name).replace("@@SRVFLD@@", srv_field)\
+   .replace("@@STREET@@", STREET).replace("@@CITY@@", CITY).replace("@@STATE@@", STATE)\
+   .replace("@@HOURS@@", HOURS).replace("@@ICMAP@@", IC["map"]).replace("@@ICCLK@@", IC["clock"])\
+   .replace("@@ICWA@@", IC["whatsapp"])
 
 
 def acc(items, klass=""):

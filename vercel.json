@@ -2,6 +2,48 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": ".",
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/sobre",
+      "destination": "/sobre.html"
+    },
+    {
+      "source": "/metodo",
+      "destination": "/metodo.html"
+    },
+    {
+      "source": "/equipe",
+      "destination": "/equipe.html"
+    },
+    {
+      "source": "/tratamentos",
+      "destination": "/tratamentos.html"
+    },
+    {
+      "source": "/contato",
+      "destination": "/contato.html"
+    },
+    {
+      "source": "/fisioterapia",
+      "destination": "/fisioterapia.html"
+    },
+    {
+      "source": "/quiropraxia",
+      "destination": "/quiropraxia.html"
+    },
+    {
+      "source": "/pilates",
+      "destination": "/pilates.html"
+    },
+    {
+      "source": "/liberacao-miofascial",
+      "destination": "/liberacao-miofascial.html"
+    },
+    {
+      "source": "/terapias-manuais",
+      "destination": "/terapias-manuais.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/sobre-nos",
@@ -10,11 +52,6 @@
     },
     {
       "source": "/sobre-nos/",
-      "destination": "/sobre.html",
-      "permanent": true
-    },
-    {
-      "source": "/sobre",
       "destination": "/sobre.html",
       "permanent": true
     },
@@ -44,28 +81,13 @@
       "permanent": true
     },
     {
-      "source": "/metodo",
-      "destination": "/metodo.html",
-      "permanent": true
-    },
-    {
       "source": "/metodo/",
       "destination": "/metodo.html",
       "permanent": true
     },
     {
-      "source": "/equipe",
-      "destination": "/equipe.html",
-      "permanent": true
-    },
-    {
       "source": "/equipe/",
       "destination": "/equipe.html",
-      "permanent": true
-    },
-    {
-      "source": "/tratamentos",
-      "destination": "/tratamentos.html",
       "permanent": true
     },
     {
@@ -84,11 +106,6 @@
       "permanent": true
     },
     {
-      "source": "/contato",
-      "destination": "/contato.html",
-      "permanent": true
-    },
-    {
       "source": "/contato/",
       "destination": "/contato.html",
       "permanent": true
@@ -101,11 +118,6 @@
     {
       "source": "/contato/obrigado/",
       "destination": "/contato.html",
-      "permanent": true
-    },
-    {
-      "source": "/fisioterapia",
-      "destination": "/fisioterapia.html",
       "permanent": true
     },
     {
@@ -144,11 +156,6 @@
       "permanent": true
     },
     {
-      "source": "/quiropraxia",
-      "destination": "/quiropraxia.html",
-      "permanent": true
-    },
-    {
       "source": "/quiropraxia/",
       "destination": "/quiropraxia.html",
       "permanent": true
@@ -184,11 +191,6 @@
       "permanent": true
     },
     {
-      "source": "/pilates",
-      "destination": "/pilates.html",
-      "permanent": true
-    },
-    {
       "source": "/pilates/",
       "destination": "/pilates.html",
       "permanent": true
@@ -204,18 +206,8 @@
       "permanent": true
     },
     {
-      "source": "/liberacao-miofascial",
-      "destination": "/liberacao-miofascial.html",
-      "permanent": true
-    },
-    {
       "source": "/liberacao-miofascial/",
       "destination": "/liberacao-miofascial.html",
-      "permanent": true
-    },
-    {
-      "source": "/terapias-manuais",
-      "destination": "/terapias-manuais.html",
       "permanent": true
     },
     {

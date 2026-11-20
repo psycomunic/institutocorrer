@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Gera todas as páginas do site do Instituto Correr."""
 import os, sys, json
-# O console do Windows usa cp1252 por padrão e engasga nos acentos e no "✓".
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except AttributeError:
@@ -11,6 +10,7 @@ from partials import *
 import schema as S
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+
 
 def write(name, html):
     with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
@@ -24,11 +24,15 @@ def cards_tratamentos(limit=None, show_bullets=True):
         b = ""
         if show_bullets:
             b = "<ul>" + "".join("<li>" + x + "</li>" for x in t["bullets"]) + "</ul>"
+        wmsg = wa_link("Olá! Gostaria de agendar uma avaliação de " + t["nome"] + " no Instituto Correr.")
         out += ('<article class="card tcard reveal" data-d="' + str(i % 4) + '">'
                 '<span class="ic">' + IC[t["icon"]] + '</span>'
                 '<h3>' + t["nome"] + '</h3>'
                 '<p>' + t["curto"] + '</p>' + b +
-                '<a class="tlink" href="' + t["slug"] + '.html">Conhecer ' + t["nome"].lower() + ' ' + IC["arrow"] + '</a>'
+                '<div class="tcard__foot">'
+                '<a class="btn btn--wa btn--sm" href="' + wmsg + '" target="_blank" rel="noopener">' + IC["whatsapp"] + ' Agendar</a>'
+                '<a class="tlink" href="' + t["slug"] + '.html">Detalhes ' + IC["arrow"] + '</a>'
+                '</div>'
                 '</article>')
     return out
 
@@ -37,11 +41,15 @@ def cards_svc(limit=None):
     """Cards de serviço centralizados, brancos, para usar sobre a faixa verde."""
     out = ""
     for i, t in enumerate(TREATMENTS[:limit] if limit else TREATMENTS):
+        wmsg = wa_link("Olá! Gostaria de agendar uma avaliação de " + t["nome"] + " no Instituto Correr.")
         out += ('<article class="svc reveal" data-d="' + str(i % 4) + '">'
                 '<span class="ic">' + IC[t["icon"]] + '</span>'
                 '<h3>' + t["nome"] + '</h3>'
                 '<p>' + t["curto"] + '</p>'
-                '<a class="btn btn--primary btn--sm" href="' + t["slug"] + '.html">Saiba mais</a>'
+                '<div class="svc__actions">'
+                '<a class="btn btn--wa btn--sm" href="' + wmsg + '" target="_blank" rel="noopener">' + IC["whatsapp"] + ' Agendar</a>'
+                '<a class="btn btn--ghost btn--sm" href="' + t["slug"] + '.html">Saiba mais</a>'
+                '</div>'
                 '</article>')
     return out
 
@@ -54,15 +62,15 @@ TEAM = [
          bio="Formada desde 2012, atua com o Método Busquet, treinamento funcional e pilates. Trabalha a integração entre corpo e mente em cada plano de tratamento."),
     dict(img="ketlin", nome="Ketlin Cardoso", role="Financeiro e Agendamentos", reg="Experiência em estética",
          bio="Cuida da agenda, do financeiro e da experiência de quem chega ao Instituto, do primeiro contato ao acompanhamento do plano."),
-    # reg vazio de proposito: "Atendimento" era a funcao dita de novo.
     dict(img="terezinha", nome="Terezinha", role="Recepção", reg="",
          bio="O primeiro rosto de quem chega pela manhã. Recebe cada paciente pelo nome e mantém o clima leve que define a casa."),
 ]
 
+
 def cards_equipe(bio=True):
     out = ""
     for i, m in enumerate(TEAM):
-        reg = m["reg"].strip()   # opcional: so sai quando acrescenta informacao
+        reg = m["reg"].strip()
         out += ('<article class="team-card reveal" data-d="' + str(i % 4) + '">'
                 '<div class="team-card__media">'
                 '<img src="assets/img/' + m["img"] + '.webp" alt="' + m["nome"] + ', ' + m["role"]
@@ -78,9 +86,34 @@ def cards_equipe(bio=True):
     return out
 
 
+def symptom_cards(items, service_label=""):
+    """Gera grade de queixas clicáveis que abrem o WhatsApp já com a queixa preenchida."""
+    out = '<div class="qgrid mt-8">'
+    prefix = ("Olá! Gostaria de agendar uma avaliação de " + service_label + " no Instituto Correr. "
+              if service_label else "Olá! Gostaria de agendar uma avaliação no Instituto Correr. ")
+    for i, (titulo, sub) in enumerate(items):
+        wh = wa_link(prefix + "Minha principal queixa é: " + titulo + ".")
+        out += ('<a class="qcard reveal" data-d="' + str(i % 3) + '" href="' + wh
+                + '" target="_blank" rel="noopener" data-track-loc="triagem_queixa">'
+                '<div class="qcard__txt"><b>' + titulo + '</b><span>' + sub + '</span></div>'
+                '<span class="qcard__cta">' + IC["whatsapp"] + '<span>Falar</span></span>'
+                '</a>')
+    out += '</div>'
+    return out
+
+
 # ==========================================================================
 # HOME
 # ==========================================================================
+QUEIXAS_HOME = [
+    ("Dor na coluna (lombar ou cervical)", "Travamento, queimação ou dor ao sentar e levantar"),
+    ("Hérnia de disco e nervo ciático", "Dor irradiada para perna, glúteo ou braço"),
+    ("Dor no ombro, joelho ou quadril", "Limitação ao caminhar, subir escada ou treinar"),
+    ("Lesões no esporte e na corrida", "Recuperação e retorno seguro aos treinos"),
+    ("Pós-operatório ortopédico", "Reabilitação guiada etapa por etapa"),
+    ("Dor de cabeça e tensão no pescoço", "Cefaleia cervical, estalos e sobrecarga postural"),
+]
+
 FAQ_HOME = [
  ("Preciso de pedido médico para fazer fisioterapia?",
   "Não. O fisioterapeuta é um profissional de primeiro contato: você pode agendar sua avaliação diretamente conosco. Se durante a avaliação identificarmos a necessidade de exames ou de acompanhamento médico, orientamos e encaminhamos."),
@@ -95,6 +128,7 @@ FAQ_HOME = [
  ("Faço exercício e sinto dor. Devo parar?",
   "Nem sempre. A dor é um sinal de proteção e precisa ser interpretada, não silenciada. Na avaliação identificamos o que está gerando o alerta e ajustamos carga, técnica e volume. O objetivo é você continuar se movendo com segurança, e não parar."),
 ]
+
 
 def build_home():
     sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.faq(FAQ_HOME))
@@ -115,40 +149,36 @@ def build_home():
     <div class="hero__copy">
       <span class="eyebrow reveal">Fisioterapia, quiropraxia e pilates em Blumenau</span>
       <h1 class="reveal" data-d="1">Volte a fazer o que quiser, <em>sem se preocupar com a dor</em></h1>
-      <p class="lead reveal" data-d="2">Fisioterapia, quiropraxia e pilates com avaliação detalhada e conduta individualizada. A gente trata a causa, não só o sintoma, para que você volte ao movimento com segurança e sem recaída.</p>
+      <p class="lead reveal" data-d="2">Avaliação física detalhada e conduta individualizada em Blumenau. Tratamos a causa do problema, não só o sintoma, para você recuperar o movimento com segurança e sem recaída.</p>
       <div class="btn-row reveal" data-d="3">
-        <a class="btn btn--primary btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
-        <a class="btn btn--light btn--lg" href="metodo.html">Conhecer o método</a>
+        <a class="btn btn--wa btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação no WhatsApp</a>
+        <a class="btn btn--light btn--lg" href="#queixas">Escolher minha queixa</a>
       </div>
+      <p class="thero__micro reveal" data-d="3">@@ICCLK@@ Centro/Garcia, Blumenau · Seg. a sex. até as 20h · Sem pedido médico</p>
     </div>
     <div class="hero__foot reveal" data-d="4">
       <div class="hero__badge">
         <span class="ic">@@ICSHIELD@@</span>
-        <div><b>Avaliação antes de qualquer conduta</b><span>Sem protocolo genérico</span></div>
+        <div><b>Avaliação antes de qualquer conduta</b><span>CREFITO 175512 · Particular c/ recibo p/ reembolso</span></div>
       </div>
       <div class="statpills">
         <div class="statpill"><b><span data-count="10">0</span>+</b><span>anos de prática clínica</span></div>
         <div class="statpill"><b><span data-count="5">0</span></b><span>especialidades integradas</span></div>
-        <div class="statpill"><b>3</b><span>prevenir, reabilitar, performar</span></div>
+        <div class="statpill"><b>20h</b><span>atendimento seg. a sex.</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== FAIXA DE QUEIXAS ATENDIDAS ===== -->
-<section class="trust-strip">
+<!-- ===== TRIAGEM INTERATIVA DE QUEIXAS ===== -->
+<section class="section section--tight section--soft" id="queixas">
   <div class="container">
-    <span class="trust-strip__label">O que mais atendemos</span>
-    <div class="pill-row reveal" style="justify-content:center">
-      <span class="pill">@@ICC@@ Dor na coluna</span>
-      <span class="pill">@@ICC@@ Hérnia de disco e ciática</span>
-      <span class="pill">@@ICC@@ Lesões esportivas</span>
-      <span class="pill">@@ICC@@ Pós-operatório</span>
-      <span class="pill">@@ICC@@ Dor no ombro e joelho</span>
-      <span class="pill">@@ICC@@ LER / DORT</span>
-      <span class="pill">@@ICC@@ Cefaleia de origem cervical</span>
-      <span class="pill">@@ICC@@ Postura e mobilidade</span>
+    <div class="sec-head sec-head--center">
+      <span class="eyebrow eyebrow--center reveal">Atendimento direto</span>
+      <h2 class="reveal" data-d="1">O que está incomodando você hoje?</h2>
+      <p class="reveal" data-d="2">Toque na opção mais próxima do seu caso para abrir o WhatsApp já com a mensagem preenchida para a nossa equipe.</p>
     </div>
+    @@QHOME@@
   </div>
 </section>
 
@@ -181,7 +211,10 @@ def build_home():
           <li><span class="n">02</span> Equipe multidisciplinar com formação continuada</li>
           <li><span class="n">03</span> Tecnologia aplicada com critério clínico</li>
         </ul>
-        <a class="tlink reveal mt-6" data-d="3" href="sobre.html">Conhecer o Instituto @@ICARR@@</a>
+        <div class="btn-row reveal mt-6" data-d="3">
+          <a class="btn btn--wa" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Conversar sobre o meu caso</a>
+          <a class="btn btn--ghost" href="sobre.html">Conhecer o Instituto</a>
+        </div>
       </div>
     </div>
   </div>
@@ -202,28 +235,6 @@ def build_home():
   </div>
 </section>
 
-<!-- ===== MÉTODO ===== -->
-<section class="section section--sand">
-  <div class="container">
-    <div class="sec-head sec-head--center">
-      <span class="eyebrow eyebrow--center reveal">Nosso método</span>
-      <h2 class="reveal" data-d="1">Quatro princípios que guiam cada atendimento</h2>
-      <p class="reveal" data-d="2">O que a gente quer é fazer diferença no seu mover, oferecendo um serviço que vai além da fisioterapia convencional.</p>
-    </div>
-    <div class="grid grid-4 mt-8">
-      <div class="pillar reveal"><div class="pillar__n">01</div><h3>Entender a dor</h3><p>A dor é um sinal de proteção. Aprender a ler esse sinal e a administrar os próprios limites é o que resolve o alerta na origem.</p></div>
-      <div class="pillar reveal" data-d="1"><div class="pillar__n">02</div><h3>Saúde individual</h3><p>Não existe só um jeito de ser saudável. Nada de protocolo rígido: cada paciente é um sistema único e complexo.</p></div>
-      <div class="pillar reveal" data-d="2"><div class="pillar__n">03</div><h3>Base científica</h3><p>Embasamento científico como ponto de partida, com flexibilidade para adaptar avaliação e conduta ao que o seu corpo responde.</p></div>
-      <div class="pillar reveal" data-d="3"><div class="pillar__n">04</div><h3>Tecnologia humana</h3><p>Tecnologia avançada a serviço do protocolo, com uma avaliação inicial que é sempre o que determina o resultado.</p></div>
-    </div>
-    <div class="quote reveal mt-8" style="max-width:760px">
-      <p>“A gente te ajuda a manter a saúde dos seus movimentos e a respeitar o seu corpo pra você não se machucar.”</p>
-      <cite>Instituto Correr</cite>
-    </div>
-    <div class="btn-row mt-8 reveal"><a class="btn btn--primary" href="metodo.html">Ver o método completo</a></div>
-  </div>
-</section>
-
 <!-- ===== JORNADA ===== -->
 <section class="section">
   <div class="container">
@@ -233,7 +244,7 @@ def build_home():
         <h2 class="reveal mt-5" data-d="1">Da primeira conversa até a alta</h2>
         <p class="lead reveal mt-5" data-d="2">Um caminho claro, com objetivos definidos em cada etapa. Você sempre sabe onde está e o que vem a seguir.</p>
         <div class="btn-row reveal mt-6" data-d="3">
-          <a class="btn btn--primary" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Começar pela avaliação</a>
+          <a class="btn btn--wa" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Começar pela avaliação</a>
         </div>
       </div>
       <div class="steps reveal">
@@ -247,25 +258,13 @@ def build_home():
   </div>
 </section>
 
-<!-- ===== STATS ===== -->
-<section class="section section--tight section--mute">
-  <div class="container">
-    <div class="stats">
-      <div class="stat reveal"><b><span data-count="10">0</span>+</b><span>anos de prática clínica</span></div>
-      <div class="stat reveal" data-d="1"><b><span data-count="5">0</span></b><span>especialidades no mesmo lugar</span></div>
-      <div class="stat reveal" data-d="2"><b><span data-count="100">0</span>%</b><span>dos planos são individualizados</span></div>
-      <div class="stat reveal" data-d="3"><b>1</b><span>avaliação antes de qualquer conduta</span></div>
-    </div>
-  </div>
-</section>
-
 <!-- ===== EQUIPE ===== -->
-<section class="section">
+<section class="section section--mute">
   <div class="container">
     <div class="sec-head sec-head--center">
       <span class="eyebrow eyebrow--center reveal">Quem cuida de você</span>
       <h2 class="reveal" data-d="1">Uma equipe multidisciplinar com olhar humano</h2>
-      <p class="reveal" data-d="2">Fisioterapeutas, quiropraxistas e uma estrutura de atendimento pensada para que você se sinta acolhido do primeiro contato à alta.</p>
+      <p class="reveal" data-d="2">Fisioterapeutas, quiropraxia e uma estrutura de atendimento pensada para que você se sinta acolhido do primeiro contato à alta.</p>
     </div>
     <div class="grid grid-4 mt-8">@@TEAM@@</div>
     <div class="center mt-8"><a class="btn btn--ghost reveal" href="equipe.html">Conhecer a equipe</a></div>
@@ -302,6 +301,8 @@ def build_home():
   </div>
 </section>
 
+@@FASTHOME@@
+
 <!-- ===== FAQ ===== -->
 <section class="section">
   <div class="container">
@@ -309,8 +310,10 @@ def build_home():
       <div class="sticky-col">
         <span class="eyebrow reveal">Dúvidas frequentes</span>
         <h2 class="reveal mt-5" data-d="1">Antes de agendar, talvez você queira saber</h2>
-        <p class="reveal mt-5" data-d="2">Não encontrou sua dúvida? Fale com a gente pelo WhatsApp. Respondemos em horário comercial.</p>
-        <a class="tlink reveal mt-6" data-d="3" href="@@WA@@" target="_blank" rel="noopener">Perguntar no WhatsApp @@ICARR@@</a>
+        <p class="reveal mt-5" data-d="2">Não encontrou sua dúvida? Fale com a gente pelo WhatsApp. Respondemos rápido em horário comercial.</p>
+        <div class="btn-row reveal mt-6" data-d="3">
+          <a class="btn btn--wa" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Perguntar no WhatsApp</a>
+        </div>
       </div>
       <div class="reveal">@@FAQ@@</div>
     </div>
@@ -339,7 +342,7 @@ def build_home():
 </section>
 
 </main>
-"""
+""".replace("@@QHOME@@", symptom_cards(QUEIXAS_HOME)).replace("@@FASTHOME@@", fast_schedule_section(""))
     h += cta_band()
     h += footer()
     return _fill(h, svc=cards_svc(), team=cards_equipe(bio=False), faq=acc(FAQ_HOME))
@@ -359,7 +362,7 @@ def _fill(h, tcards="", team="", faq="", svc=""):
         "@@ICZAP@@": IC["zap"], "@@ICCAL@@": IC["calendar"], "@@ICFILE@@": IC["file"],
         "@@ICTREND@@": IC["trending"], "@@ICACT@@": IC["activity"],
         "@@ST5@@": IC["star"] * 5,
-        "@@TEL@@": PHONE_TEL, "@@PH@@": PHONE_DISPLAY, "@@EMAIL@@": EMAIL,
+        "@@TEL@@": PHONE_TEL, "@@PH@@": PHONE_DISPLAY, "@@EMAIL@@": EMAIL, "@@EML@@": email_html(),
         "@@HOURS@@": HOURS, "@@STREET@@": STREET, "@@CITY@@": CITY,
         "@@STATE@@": STATE, "@@CEP@@": CEP,
         "@@TCARDS@@": tcards, "@@TEAM@@": team, "@@FAQ@@": faq, "@@SVC@@": svc,
@@ -395,7 +398,7 @@ def build_sobre():
         <p class="reveal mt-5" data-d="2"><strong>Executar corretamente um movimento não é difícil e nem precisa ser sofrido.</strong> Quando você entende como o seu corpo funciona, o risco de lesão cai e a adesão ao exercício sobe, porque deixa de existir o medo de se machucar.</p>
         <p class="reveal mt-5" data-d="2">É esse o trabalho do Instituto Correr: desmistificar, orientar o movimento seguro e devolver a você uma relação positiva com o próprio corpo.</p>
         <div class="btn-row reveal mt-6" data-d="3">
-          <a class="btn btn--primary" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
+          <a class="btn btn--wa" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação no WhatsApp</a>
           <a class="btn btn--ghost" href="metodo.html">Ver o método</a>
         </div>
       </div>
@@ -477,6 +480,7 @@ FAQ_METODO = [
   "A reavaliação existe justamente para isso. Se o corpo responde diferente do previsto, o plano é ajustado e, quando o caso pede outra especialidade, orientamos e encaminhamos."),
 ]
 
+
 def build_metodo():
     sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.breadcrumb([("Nosso método", "metodo.html")]), S.faq(FAQ_METODO))
     h = head("Nosso Método | Instituto Correr, Fisioterapia em Blumenau",
@@ -522,7 +526,7 @@ def build_metodo():
         <span class="eyebrow reveal">A jornada</span>
         <h2 class="reveal mt-5" data-d="1">Cinco etapas, sem caixa-preta</h2>
         <p class="lead reveal mt-5" data-d="2">Você acompanha o raciocínio em cada passo. Nada é feito sem que você entenda por que está sendo feito.</p>
-        <div class="btn-row reveal mt-6" data-d="3"><a class="btn btn--primary" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar minha avaliação</a></div>
+        <div class="btn-row reveal mt-6" data-d="3"><a class="btn btn--wa" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar minha avaliação</a></div>
       </div>
       <div class="steps reveal">
         <div class="step"><div class="step__n">1</div><div><h3>Anamnese</h3><p>Conversa aprofundada sobre a sua história: quando começou, o que piora, o que alivia, o que você já tentou, como é o seu dia, o que você precisa voltar a fazer. Metade do diagnóstico está aqui.</p></div></div>
@@ -644,7 +648,7 @@ def build_tratamentos():
       <div class="pillar reveal" data-d="1"><div class="pillar__n">02</div><h3>A gente examina</h3><p>Exame físico e funcional para achar a causa, não o sintoma.</p></div>
       <div class="pillar reveal" data-d="2"><div class="pillar__n">03</div><h3>Definimos juntos</h3><p>Você aprova o plano, com técnicas, frequência e prazo, antes de começar.</p></div>
     </div>
-    <div class="btn-row mt-8 reveal" style="justify-content:center"><a class="btn btn--primary btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a></div>
+    <div class="btn-row mt-8 reveal" style="justify-content:center"><a class="btn btn--wa btn--lg" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação no WhatsApp</a></div>
   </div>
 </section>
 </main>
@@ -654,124 +658,227 @@ def build_tratamentos():
 
 
 # ==========================================================================
-# PÁGINAS DE TRATAMENTO
+# PÁGINAS DE TRATAMENTO (DESTINO PRINCIPAL DAS CAMPANHAS GOOGLE ADS)
 # ==========================================================================
+FAQ_CONVENIO = (
+    "Vocês atendem convênios ou planos de saúde?",
+    "Nosso atendimento é particular, planejado para dedicar o tempo necessário à sua avaliação e ao acompanhamento individual. Emitimos recibo para que você solicite reembolso junto ao seu plano de saúde. Chame no WhatsApp para consultar valores e horários."
+)
+
 TDATA = {
 "fisioterapia": dict(
   title="Fisioterapia em Blumenau | Instituto Correr",
   desc="Fisioterapia em Blumenau/SC com avaliação detalhada e conduta individualizada. Tratamos a causa da dor para um retorno seguro e sem recidivas. Agende pelo WhatsApp.",
-  h1="Fisioterapia que vai além do alívio da dor",
-  lead="A fisioterapia do Instituto Correr começa onde a maioria termina: na causa. Avaliamos a mecânica do seu movimento para resolver o problema, e não apenas o sintoma que ele produz.",
+  h1="Fisioterapia individualizada para tratar a causa da sua dor",
+  lead="Avaliação detalhada do seu movimento em Blumenau para aliviar a dor com segurança, corrigir a origem da sobrecarga e devolver sua rotina sem recaídas.",
+  queixas=[
+    ("Dor na coluna (lombar ou cervical)", "Dor ao ficar sentado, agachar, dormir ou carregar peso"),
+    ("Dor no ombro, joelho ou quadril", "Estalos, perda de força ou dor ao caminhar e subir escadas"),
+    ("Lesões esportivas e corrida", "Estiramentos, entorses, canelite, fascite e retorno ao esporte"),
+    ("Reabilitação pós-operatória", "Joelho, ombro, coluna e quadril com protocolo seguro"),
+    ("Tendinites, bursites e sobrecarga", "Dores repetitivas no trabalho ou no treino"),
+    ("Outra dor ou dúvida sobre o meu caso", "Converse direto com a equipe para entender a indicação"),
+  ],
   intro_h="Alívio é o começo, resolução é o objetivo",
-  intro_p=["Quase todo mundo já passou por uma sessão que aliviou na hora e não sustentou o resultado. Isso acontece quando o tratamento age sobre o local que dói sem investigar o que sobrecarregou aquele tecido.",
-           "Nossos fisioterapeutas trabalham sobre as alterações biomecânicas que, se não corrigidas, viram quadro crônico ou lesão de repetição. A avaliação é personalizada e guiada por protocolos científicos atuais.",
-           "O objetivo declarado do tratamento é um só: <strong>retorno breve e seguro às atividades cotidianas, com recuperação total e sem recidivas</strong>."],
-  bene=[("Dor tratada na origem","Investigação da cadeia inteira de movimento, não só do ponto doloroso."),
-        ("Conduta baseada em evidência","Técnicas escolhidas pelo que a literatura mostra que funciona no seu tipo de caso."),
-        ("Terapia humanizada e precisa","Você entende cada etapa, participa das decisões e sabe o que esperar."),
-        ("Recuperação funcional completa","A alta acontece quando você volta ao que fazia antes, não quando a dor some.")],
-  para=["Dor lombar, cervical, torácica e de ombro","Lesões esportivas musculares, ligamentares e tendíneas",
-        "Reabilitação pós-operatória (joelho, ombro, coluna, quadril)","Tendinopatias e quadros de sobrecarga por repetição",
-        "Dores crônicas que já não respondem a analgésico","Perda de mobilidade, força ou equilíbrio",
-        "Retorno ao esporte após lesão","LER / DORT e queixas relacionadas ao trabalho"],
-  faq=[("Quantas sessões de fisioterapia vou precisar?","O número sai da avaliação, não de um pacote pré-definido. Quadros agudos simples costumam responder em poucas semanas; casos crônicos ou pós-operatórios pedem um plano mais longo, sempre com reavaliação periódica."),
-       ("Preciso de encaminhamento médico?","Não. O fisioterapeuta é profissional de primeiro contato e você pode agendar direto. Se identificarmos necessidade de exame ou avaliação médica, orientamos e encaminhamos."),
-       ("A fisioterapia serve para prevenir lesão?","Serve, e é o uso mais subutilizado dela. Corrigir mecânica e ajustar carga antes que a dor apareça é mais rápido, mais barato e mais eficaz do que reabilitar depois."),
-       ("Posso continuar treinando durante o tratamento?","Na maioria dos casos, sim, com ajuste de carga e de gesto. Parar completamente raramente é a melhor conduta. O que muda é como e quanto você treina.")]),
+  intro_p=[
+    "Quase todo mundo já passou por uma sessão que aliviou na hora e não sustentou o resultado. Isso acontece quando o tratamento age sobre o local que dói sem investigar o que sobrecarregou aquele tecido.",
+    "Nossos fisioterapeutas trabalham sobre as alterações biomecânicas que, se não corrigidas, viram quadro crônico ou lesão de repetição. A avaliação é personalizada e guiada por protocolos científicos atuais.",
+    "O objetivo declarado do tratamento é um só: <strong>retorno breve e seguro às atividades cotidianas, com recuperação total e sem recidivas</strong>.",
+  ],
+  bene=[
+    ("Dor tratada na origem", "Investigação da cadeia inteira de movimento, não só do ponto doloroso."),
+    ("Conduta baseada em evidência", "Técnicas escolhidas pelo que a literatura mostra que funciona no seu tipo de caso."),
+    ("Terapia humanizada e precisa", "Você entende cada etapa, participa das decisões e sabe o que esperar."),
+    ("Recuperação funcional completa", "A alta acontece quando você volta ao que fazia antes, não quando a dor some."),
+  ],
+  para=[
+    "Dor lombar, cervical, torácica e de ombro",
+    "Lesões esportivas musculares, ligamentares e tendíneas",
+    "Reabilitação pós-operatória (joelho, ombro, coluna, quadril)",
+    "Tendinopatias e quadros de sobrecarga por repetição",
+    "Dores crônicas que já não respondem a analgésico",
+    "Perda de mobilidade, força ou equilíbrio",
+    "Retorno ao esporte após lesão",
+    "LER / DORT e queixas relacionadas ao trabalho",
+  ],
+  faq=[
+    ("Preciso de encaminhamento médico para agendar?", "Não. O fisioterapeuta é profissional de primeiro contato e você pode agendar sua avaliação direto pelo WhatsApp. Se identificarmos necessidade de exame ou avaliação médica, orientamos e encaminhamos."),
+    FAQ_CONVENIO,
+    ("Quantas sessões de fisioterapia vou precisar?", "O número sai da avaliação, não de um pacote pré-definido. Quadros agudos simples costumam responder em poucas semanas; casos crônicos ou pós-operatórios pedem um plano mais longo, sempre com reavaliação periódica."),
+    ("A fisioterapia serve para prevenir lesão?", "Serve, e é o uso mais subutilizado dela. Corrigir mecânica e ajustar carga antes que a dor apareça é mais rápido, mais barato e mais eficaz do que reabilitar depois."),
+    ("Posso continuar treinando durante o tratamento?", "Na maioria dos casos, sim, com ajuste de carga e de gesto. Parar completamente raramente é a melhor conduta. O que muda é como e quanto você treina."),
+  ]),
 
 "quiropraxia": dict(
   title="Quiropraxia em Blumenau | Instituto Correr",
   desc="Quiropraxia em Blumenau/SC: ajustes precisos para dor de coluna, cervicalgia, cefaleias, hérnia de disco e ciática. Avaliação detalhada no Instituto Correr.",
-  h1="Quiropraxia: cada coisa no lugar certo",
-  lead="Ajustamos o seu corpo para que tudo fique no lugar certo. Isso faz com que você se sinta mais equilibrado e confortável, com mobilidade restaurada e menos dor.",
-  intro_h="Ajuste não é estalo, é decisão clínica",
-  intro_p=["A quiropraxia atua sobre articulações que perderam mobilidade e passaram a sobrecarregar as vizinhas. Restaurar esse movimento devolve função à região e reduz o estímulo doloroso.",
-           "Antes de qualquer ajuste, existe uma avaliação detalhada: conversa sobre a sua história, exame físico e exame funcional. É ela que determina o que ajustar, com que técnica e com que intensidade.",
-           "Nossa equipe utiliza ferramentas inteligentes para ganhar precisão. O ajuste é aplicado onde o exame indicou, na dose que o seu caso comporta."],
-  bene=[("Mobilidade articular restaurada","A articulação volta a se mover no arco que deveria, e para de sobrecarregar as vizinhas."),
-        ("Alívio sem medicação","Abordagem natural e não invasiva, frequentemente com resposta perceptível já nas primeiras sessões."),
-        ("Postura mais equilibrada","Reorganização da mecânica da coluna, com reflexo direto na forma como você se sustenta."),
-        ("Integração com fisioterapia","O ajuste abre a janela; o exercício consolida o ganho. Aqui as duas coisas conversam.")],
-  para=["Dores nas costas, no pescoço e na coluna","Dores de cabeça frequentes de origem cervical",
-        "Problemas posturais","Lesões por esforço repetitivo","Hérnia de disco","Dor ciática",
-        "Gestantes com queixas de coluna","Idosos com dores articulares",
-        "Atletas em busca de melhora de performance","Recuperação após acidentes",
-        "Quem procura uma abordagem natural e não invasiva para a dor"],
-  faq=[("O ajuste quiroprático dói?","Não deve doer. O que a maioria sente é um alívio imediato de pressão. Pode haver um desconforto muscular leve nas horas seguintes, semelhante ao de um exercício novo, e ele passa."),
-       ("Aquele estalo é osso saindo do lugar?","Não. O som vem da liberação de gás dentro da cápsula articular quando a articulação se movimenta. Nada sai do lugar. Pelo contrário, o objetivo é devolver movimento a algo que estava travado."),
-       ("Quiropraxia serve para hérnia de disco?","Pode fazer parte do tratamento, com técnica e dosagem adequadas ao seu caso. Isso é definido na avaliação. Em alguns quadros a conduta inicial é outra, e a gente diz isso com clareza."),
-       ("Gestante pode fazer quiropraxia?","Sim, com técnicas e posicionamento específicos. É uma das queixas mais comuns que atendemos, dada a mudança de carga sobre a coluna na gestação.")]),
+  h1="Quiropraxia clínica para aliviar a dor e destravar a coluna",
+  lead="Ajustes articulares precisos precedidos de avaliação física detalhada em Blumenau. Indicado para dor nas costas, cervical, ciática, hérnia de disco e tensão postural.",
+  queixas=[
+    ("Dor nas costas ou coluna travada", "Dificuldade para virar, levantar da cama ou ficar em pé"),
+    ("Hérnia de disco ou dor ciática", "Dor que desce para o glúteo, coxa ou perna"),
+    ("Dor no pescoço e torcicolo", "Rigidez cervical, dor nos ombros e limitação ao girar a cabeça"),
+    ("Dor de cabeça de origem cervical", "Cefaleias frequentes ligadas à tensão na nuca"),
+    ("Sobrecarga postural no trabalho", "Desconforto acumulado por horas sentado ou dirigindo"),
+    ("Outra queixa articular ou dúvida", "Fale no WhatsApp para avaliarmos se a quiropraxia é indicada"),
+  ],
+  intro_h="Ajuste não é apenas estalo, é decisão clínica",
+  intro_p=[
+    "A quiropraxia atua sobre articulações que perderam mobilidade e passaram a sobrecarregar as vizinhas. Restaurar esse movimento devolve função à região e reduz o estímulo doloroso.",
+    "Antes de qualquer ajuste, existe uma avaliação detalhada: conversa sobre a sua história, exame físico e exame funcional. É ela que determina o que ajustar, com que técnica e com que intensidade.",
+    "No Instituto Correr, quando necessário, integramos o ajuste quiroprático com fisioterapia e fortalecimento para que o alívio se sustente no longo prazo.",
+  ],
+  bene=[
+    ("Mobilidade articular restaurada", "A articulação volta a se mover no arco que deveria, e para de sobrecarregar as vizinhas."),
+    ("Alívio sem medicação", "Abordagem conservadora e não invasiva, frequentemente com melhora perceptível já no início."),
+    ("Postura mais equilibrada", "Reorganização da mecânica da coluna, com reflexo direto na forma como você se sustenta."),
+    ("Integração com fisioterapia", "O ajuste abre a janela de alívio; o exercício consolida o ganho para evitar recaída."),
+  ],
+  para=[
+    "Dores nas costas, no pescoço e na coluna",
+    "Dores de cabeça frequentes de origem cervical",
+    "Problemas posturais e rigidez articular",
+    "Hérnia de disco e dor ciática (após avaliação clínica)",
+    "Lesões por esforço repetitivo",
+    "Gestantes com queixas de coluna",
+    "Idosos com dores articulares e perda de mobilidade",
+    "Atletas em busca de mobilidade e performance",
+  ],
+  faq=[
+    ("O ajuste quiroprático dói?", "Não deve doer. O que a maioria sente é um alívio imediato de pressão. Pode haver um desconforto muscular leve nas horas seguintes, semelhante ao de um exercício novo, e ele passa rapidamente."),
+    ("Quiropraxia serve para hérnia de disco e ciático?", "Pode fazer parte do tratamento, com técnica e dosagem adequadas ao seu estágio clínico. Isso é definido com segurança na avaliação inicial. Quando o caso pede fisioterapia associada, alinhamos tudo na hora."),
+    FAQ_CONVENIO,
+    ("Aquele estalo é osso saindo do lugar?", "Não. O som vem da liberação natural de gás dentro da cápsula articular quando a articulação recupera movimento. Nada sai do lugar: o objetivo é destravar o que estava rígido."),
+    ("Gestante pode fazer quiropraxia?", "Sim, com técnicas suaves e posicionamento específico. É uma queixa muito comum devido à mudança de carga sobre a lombar e a pelve na gestação."),
+  ]),
 
 "pilates": dict(
   title="Pilates em Blumenau | Estúdio do Instituto Correr",
   desc="Estúdio de pilates em Blumenau/SC com aparelhos completos e séries individualizadas a partir da avaliação de movimento. Prevenção, tratamento e performance.",
-  h1="Pilates com avaliação de movimento por trás",
-  lead="Estúdio completo de aparelhos e acessórios, com um propósito: entender e avaliar o seu movimento para prevenir, tratar e melhorar a sua performance.",
+  h1="Pilates clínico com séries feitas para o seu corpo",
+  lead="Estúdio completo de aparelhos em Blumenau conduzido por fisioterapeutas. Avaliamos o seu movimento antes de montar cada aula para fortalecer sem dor.",
+  queixas=[
+    ("Fortalecer a coluna e o core", "Proteger lombar e cervical contra crises de dor"),
+    ("Continuar após a fisioterapia", "Manter o ganho da reabilitação sem voltar à estaca zero"),
+    ("Melhorar postura e flexibilidade", "Sair do sedentarismo com acompanhamento próximo"),
+    ("Pilates para gestantes ou pós-parto", "Exercício seguro adaptado a cada fase"),
+    ("Equilíbrio e autonomia para 60+", "Força, mobilidade e prevenção de quedas"),
+    ("Condicionamento complementar ao esporte", "Estabilidade e controle motor para correr ou treinar melhor"),
+  ],
   intro_h="A série é sua, não da turma",
-  intro_p=["Cada paciente é único. Por isso, no estúdio do Instituto Correr, o plano de trabalho é montado a partir da sua avaliação: o que você precisa ganhar, o que precisa proteger e o que precisa aprender a controlar.",
-           "O método trabalha atenção à respiração e ativação conjunta de vários grupos musculares. Na prática, isso significa controle postural, alongamento e condicionamento físico e mental construídos ao mesmo tempo.",
-           "Funciona como continuidade natural de uma reabilitação e também como porta de entrada para quem quer prevenir antes de precisar tratar."],
-  bene=[("Controle postural real","Não é 'sentar direito': é ganhar consciência e força para sustentar a postura sem esforço."),
-        ("Core e estabilidade","Ativação profunda que protege a coluna nas atividades do dia e no esporte."),
-        ("Mobilidade e alongamento","Amplitude ganha com controle, que é o que evita a lesão na hora do movimento rápido."),
-        ("Continuidade após a alta","O caminho mais eficiente para não voltar ao ponto de partida depois da reabilitação.")],
-  para=["Quem terminou a reabilitação e quer manter o ganho","Dores posturais e desconforto de coluna",
-        "Sedentários que querem começar com segurança","Gestantes e pós-parto (com avaliação)",
-        "Atletas buscando estabilidade e controle","Idosos com foco em equilíbrio e autonomia",
-        "Quem tem pouca mobilidade e muita tensão","Prevenção de lesões em quem treina forte"],
-  faq=[("Nunca fiz pilates. Consigo começar?","Sim. A avaliação existe justamente para calibrar o ponto de partida. As séries iniciais são construídas sobre o que você já consegue fazer, e evoluem conforme você responde."),
-       ("Qual a diferença do pilates aqui para o de uma academia?","A avaliação de movimento por trás. As séries são desenhadas por fisioterapeutas a partir de um exame funcional, e não a partir de um repertório padrão aplicado a todo mundo."),
-       ("Pilates substitui a fisioterapia?","São coisas diferentes. Em quadro de dor instalada, a fisioterapia trata; o pilates costuma entrar como continuidade, para consolidar e manter o ganho. Em alguns casos eles caminham juntos."),
-       ("Quantas vezes por semana?","Duas a três sessões semanais é a faixa mais comum para gerar adaptação. A frequência exata depende do seu objetivo e da sua rotina. Definimos isso na avaliação.")]),
+  intro_p=[
+    "Cada paciente é único. Por isso, no estúdio do Instituto Correr, o plano de trabalho é montado a partir da sua avaliação: o que você precisa ganhar, o que precisa proteger e o que precisa aprender a controlar.",
+    "O método trabalha atenção à respiração e ativação conjunta de vários grupos musculares. Na prática, isso significa controle postural, alongamento e condicionamento físico e mental construídos ao mesmo tempo.",
+    "Funciona como continuidade natural de uma reabilitação e também como porta de entrada segura para quem quer se exercitar sem risco de se machucar.",
+  ],
+  bene=[
+    ("Controle postural real", "Não é 'sentar direito': é ganhar consciência e força para sustentar a postura sem esforço."),
+    ("Core e estabilidade", "Ativação profunda que protege a coluna nas atividades do dia e no esporte."),
+    ("Mobilidade e alongamento", "Amplitude ganha com controle, que é o que evita a lesão na hora do movimento rápido."),
+    ("Continuidade após a alta", "O caminho mais eficiente para não voltar ao ponto de partida depois da reabilitação."),
+  ],
+  para=[
+    "Quem terminou a reabilitação e quer manter o ganho",
+    "Dores posturais e desconforto recorrente de coluna",
+    "Sedentários que querem começar com segurança",
+    "Gestantes e pós-parto (com avaliação prévia)",
+    "Atletas buscando estabilidade e controle motor",
+    "Idosos com foco em equilíbrio, força e autonomia",
+    "Quem tem pouca mobilidade e muita tensão muscular",
+    "Prevenção de lesões em quem treina corrida ou musculação",
+  ],
+  faq=[
+    ("Qual a diferença do pilates aqui para o de uma academia?", "A avaliação funcional por trás. Suas séries são desenhadas e acompanhadas por fisioterapeutas a partir de um exame de movimento, não de uma aula genérica igual para todos."),
+    ("Nunca fiz pilates. Consigo começar?", "Sim. A avaliação existe justamente para calibrar o ponto de partida. As séries iniciais respeitam o que você já consegue fazer hoje e evoluem conforme sua resposta."),
+    FAQ_CONVENIO,
+    ("Pilates substitui a fisioterapia?", "Em quadro de dor aguda instalada, a fisioterapia trata primeiro; o pilates entra como continuidade para consolidar e manter o ganho. Em muitos casos, ambos caminham juntos."),
+    ("Quantas vezes por semana é indicado?", "Duas a três sessões semanais é a frequência mais comum para gerar adaptação consistente. Definimos a melhor rotina com você na avaliação."),
+  ]),
 
 "liberacao-miofascial": dict(
   title="Liberação Miofascial em Blumenau | Instituto Correr",
   desc="Liberação miofascial em Blumenau/SC: técnica que desativa pontos-gatilho e libera a fáscia muscular, reduzindo tensão e dor. Avaliação no Instituto Correr.",
-  h1="Liberação miofascial para soltar o que está travado",
-  lead="Técnica que ativa pontos-gatilho musculares com o objetivo de liberar e relaxar a fáscia, reduzindo tensão, dor e limitação de movimento.",
+  h1="Liberação miofascial para soltar tensões e recuperar o movimento",
+  lead="Tratamento direcionado a pontos-gatilho, nódulos musculares e rigidez em Blumenau, combinando alívio preciso com investigação da causa da sobrecarga.",
+  queixas=[
+    ("Tensão crônica em pescoço e ombros", "Peso nos trapézios, estresse acumulado e rigidez"),
+    ("Nódulos dolorosos e pontos-gatilho", "Pontos que doem ao toque ou irradiam dor"),
+    ("Recuperação muscular de treinos", "Pernas pesadas, corrida intensa, crossfit ou ciclismo"),
+    ("Lombar presa e sensação de encurtamento", "Rigidez ao acordar ou após horas sentado"),
+    ("Cefaleia tensional", "Dor de cabeça associada à musculatura cervical contraída"),
+    ("Quero avaliar minha tensão muscular", "Fale no WhatsApp para indicarmos a melhor sessão"),
+  ],
   intro_h="Tensão crônica tem causa, e a gente procura ela",
-  intro_p=["A fáscia é o tecido que envolve e conecta os músculos. Quando ela perde deslizamento, o movimento fica restrito e surgem pontos de tensão que doem localmente e referem dor para outras regiões.",
-           "A liberação miofascial é uma abordagem eficaz na prevenção e no tratamento de dores e tensões musculoesqueléticas, e também para quem busca relaxamento e bem-estar.",
-           "No Instituto Correr, o protocolo é voltado a identificar a <strong>causa raiz da tensão</strong>: prevenção, redução da dor e restabelecimento da função muscular normal."],
-  bene=[("Desativação de pontos-gatilho","Trabalho direto sobre os nódulos que geram dor local e dor referida."),
-        ("Ganho imediato de amplitude","O tecido volta a deslizar e o movimento recupera alcance na mesma sessão."),
-        ("Menos tensão acumulada","Alívio para quem carrega o estresse do dia nos ombros, no pescoço e na lombar."),
-        ("Preparo para o exercício","Solta o que trava, para que o exercício terapêutico consiga construir sobre uma base melhor.")],
-  para=["Tensão muscular crônica em pescoço, ombros e lombar","Pontos-gatilho e nódulos dolorosos",
-        "Dor referida sem causa aparente","Rigidez matinal e sensação de encurtamento",
-        "Atletas com sobrecarga muscular","Quem passa o dia sentado em frente ao computador",
-        "Preparação e recuperação para treinos intensos","Cefaleia tensional"],
-  faq=[("A liberação miofascial dói?","Pode gerar um desconforto momentâneo ao trabalhar sobre um ponto de tensão. É a sensação clássica de 'dói bom'. A intensidade é dosada com você e não precisa ser insuportável para funcionar."),
-       ("É a mesma coisa que massagem relaxante?","Não. A massagem relaxante busca bem-estar geral; a liberação miofascial é uma técnica terapêutica dirigida a pontos e cadeias identificados na avaliação, com objetivo clínico definido."),
-       ("Quantas sessões são necessárias?","Muitos pacientes percebem diferença já na primeira. Mas se a tensão tem uma causa de fundo, como postura, sobrecarga ou fraqueza, resolvê-la exige combinar a liberação com exercício. Isso sai da avaliação."),
-       ("Posso fazer junto com outros tratamentos?","Sim, e costuma ser o mais indicado. É comum combinar com fisioterapia, quiropraxia ou pilates dentro do mesmo plano.")]),
+  intro_p=[
+    "A fáscia é o tecido que envolve e conecta os músculos. Quando ela perde deslizamento, o movimento fica restrito e surgem pontos de tensão que doem localmente e referem dor para outras regiões.",
+    "A liberação miofascial atua diretamente na redução de tensões musculoesqueléticas, devolvendo alcance ao movimento e aliviando a sobrecarga do dia a dia ou do treino.",
+    "No Instituto Correr, o protocolo vai além do alívio momentâneo e investiga a <strong>causa raiz da tensão</strong> para restabelecer a função muscular normal.",
+  ],
+  bene=[
+    ("Desativação de pontos-gatilho", "Trabalho direto sobre os nódulos que geram dor local e dor referida."),
+    ("Ganho imediato de amplitude", "O tecido volta a deslizar e o movimento recupera alcance já na sessão."),
+    ("Menos tensão acumulada", "Alívio para quem carrega sobrecarga de trabalho ou treino nos ombros e lombar."),
+    ("Preparo para o exercício", "Solta o que trava, para que o fortalecimento construa sobre uma base livre."),
+  ],
+  para=[
+    "Tensão muscular crônica em pescoço, ombros e lombar",
+    "Pontos-gatilho e nódulos dolorosos",
+    "Dor referida e rigidez matinal",
+    "Atletas e corredores com sobrecarga muscular",
+    "Quem passa o dia sentado em frente ao computador",
+    "Preparação e recuperação para treinos e provas",
+    "Cefaleia tensional",
+  ],
+  faq=[
+    ("É a mesma coisa que massagem relaxante?", "Não. A massagem relaxante busca bem-estar geral; a liberação miofascial é uma técnica clínica aplicada por fisioterapeuta sobre cadeias e pontos identificados na avaliação."),
+    ("A liberação miofascial dói?", "Pode gerar um desconforto momentâneo sobre o ponto tenso, mas a intensidade é sempre ajustada com você. Não precisa ser insuportável para funcionar."),
+    FAQ_CONVENIO,
+    ("Quantas sessões são necessárias?", "Muitos pacientes sentem alívio já na primeira sessão. Quando a tensão vem de fraqueza ou alteração postural, combinamos a liberação com exercícios para a dor não voltar."),
+  ]),
 
 "terapias-manuais": dict(
   title="Terapias Manuais em Blumenau | Instituto Correr",
   desc="Terapias manuais em Blumenau/SC: mobilização articular, técnicas de tecidos moles, acupuntura e ventosaterapia aplicadas com raciocínio clínico. Instituto Correr.",
-  h1="Terapias manuais aplicadas com critério",
-  lead="Mobilizações, manipulações e técnicas de tecidos moles conduzidas por raciocínio clínico. O toque é a ferramenta. A decisão de onde e como usá-lo vem da avaliação.",
+  h1="Terapias manuais aplicadas com avaliação e critério clínico",
+  lead="Mobilização articular, técnicas de tecidos moles, acupuntura e ventosaterapia em Blumenau para modular a dor e destravar o movimento com segurança.",
+  queixas=[
+    ("Dor aguda que limita o movimento", "Crise lombar, cervical ou articular que impede exercícios"),
+    ("Articulação presa ou sem amplitude", "Ombro, coluna, quadril ou tornozelo com bloqueio"),
+    ("Acupuntura para modulação de dor", "Aplicada por fisioterapeuta com especialização"),
+    ("Tensão muscular e ventosaterapia", "Recursos combinados conforme indicação clínica"),
+    ("Dor cervical e cefaleia associada", "Alívio manual preciso na região craniocervical"),
+    ("Quero saber qual técnica serve para mim", "Converse com a nossa equipe pelo WhatsApp"),
+  ],
   intro_h="A mão treinada avalia enquanto trata",
-  intro_p=["Terapia manual não é um pacote único de técnicas: é um conjunto de recursos que o fisioterapeuta escolhe conforme o que o exame encontra, como mobilização articular, manipulação, técnicas de tecidos moles, alongamento assistido, acupuntura, ventosaterapia.",
-           "A vantagem do trabalho manual é a leitura em tempo real: a mão sente a resposta do tecido e ajusta a dose durante a própria sessão.",
-           "Aqui essas técnicas raramente aparecem sozinhas. Elas reduzem a dor e abrem a janela para que o exercício terapêutico resolva o que a produziu."],
-  bene=[("Mobilização e manipulação articular","Recuperação de mobilidade em articulações restritas, com técnica adequada ao seu caso."),
-        ("Técnicas de tecidos moles","Trabalho sobre músculo, fáscia e tendão para reduzir tensão e melhorar deslizamento."),
-        ("Acupuntura e ventosaterapia","Recursos complementares para modulação da dor, aplicados por profissional com formação específica."),
-        ("Ponte para o exercício","O alívio manual cria a condição para o trabalho ativo que sustenta o resultado.")],
-  para=["Restrição de mobilidade articular","Dor cervical, torácica e lombar",
-        "Tensão muscular e encurtamentos","Quadros dolorosos agudos que limitam o exercício",
-        "Cefaleia de origem cervical","Dor no ombro e limitação de amplitude",
-        "Preparo para o exercício terapêutico","Modulação de dor em quadros crônicos"],
-  faq=[("Terapia manual sozinha resolve?","Em quadros simples, às vezes sim. Na maioria dos casos ela reduz a dor e restaura mobilidade, mas o que impede a recaída é o exercício que vem em seguida. Por isso as duas coisas andam juntas aqui."),
-       ("Vocês fazem acupuntura?","Sim. O responsável técnico tem especialização em acupuntura, que é usada como recurso complementar dentro do plano quando a avaliação indica."),
-       ("Ventosaterapia deixa marca?","Pode deixar marcas circulares temporárias, que costumam desaparecer em alguns dias. Isso é explicado antes da aplicação e a técnica só é usada com o seu consentimento."),
-       ("Quanto tempo dura a sessão?","Varia conforme a conduta. Sessões predominantemente manuais tendem a ser mais curtas e objetivas; quando combinadas com exercício, são mais longas. O tempo previsto consta no seu plano.")]),
+  intro_p=[
+    "Terapia manual não é um pacote único de técnicas: é um conjunto de recursos clínicos escolhidos conforme o exame físico, incluindo mobilização articular, manipulação, técnicas de tecidos moles, acupuntura e ventosaterapia.",
+    "A vantagem do trabalho manual é a leitura em tempo real: o profissional sente a resposta do tecido e ajusta a intensidade durante a própria sessão.",
+    "Aqui essas técnicas abrem a janela de alívio para que o movimento ativo consolide o resultado sem recaídas.",
+  ],
+  bene=[
+    ("Mobilização e manipulação articular", "Recuperação de mobilidade em articulações restritas, na dose certa para o seu caso."),
+    ("Técnicas de tecidos moles", "Trabalho sobre músculo, fáscia e tendão para reduzir tensão e melhorar deslizamento."),
+    ("Acupuntura e ventosaterapia", "Recursos complementares para controle da dor, aplicados por especialista."),
+    ("Ponte para a reabilitação ativa", "Reduz a dor inicial para permitir o fortalecimento que sustenta a melhora."),
+  ],
+  para=[
+    "Restrição de mobilidade articular",
+    "Dor cervical, torácica e lombar",
+    "Quadros dolorosos agudos que limitam o movimento",
+    "Tensão muscular persistente e encurtamentos",
+    "Cefaleia de origem cervical",
+    "Dor no ombro e limitação de alcance",
+    "Modulação de dor em quadros crônicos",
+  ],
+  faq=[
+    ("Vocês fazem acupuntura?", "Sim. Nosso responsável técnico, Roger Levi Andrade (CREFITO 175512), possui especialização em acupuntura e utiliza a técnica quando a avaliação clínica indica benefício."),
+    ("Terapia manual sozinha resolve?", "Em quadros pontuais, pode bastar. Na maioria das dores recorrentes, ela reduz a dor e devolve mobilidade enquanto o exercício terapêutico impede que o problema volte."),
+    FAQ_CONVENIO,
+    ("Ventosaterapia deixa marca?", "Pode deixar marcas circulares temporárias que somem em poucos dias. Explicamos tudo antes e só aplicamos os recursos com os quais você se sentir confortável."),
+  ]),
 }
 
 
-# Foto de cada tratamento. O alt descreve o que a imagem mostra, nao repete
-# o nome do tratamento, que ja esta no h1 e no h2 ao lado.
 TIMG = {
 "fisioterapia": ("trat-fisioterapia.webp", 900, 1349,
   "Fisioterapeuta orientando exercício com faixa elástica na perna de um paciente deitado na maca"),
@@ -790,13 +897,19 @@ def build_treatment(slug):
     t = TMAP[slug]
     d = TDATA[slug]
     img_file, img_w, img_h, img_alt = TIMG[slug]
+    wa_msg = "Olá! Gostaria de agendar uma avaliação de " + t["nome"] + " no Instituto Correr."
     sch = S.tags(S.ORG, S.ROGER, S.CARLA, S.WEBSITE, S.service(t, img_file, d["desc"]),
                  S.breadcrumb([("Tratamentos", "tratamentos.html"), (t["nome"], slug + ".html")]),
                  S.faq(d["faq"]))
-    h = head(d["title"], d["desc"], SITE + "/" + slug + ".html", sch, page_img=img_file)
-    h += header(slug)
-    h += phero([("Tratamentos", "tratamentos.html"), (t["nome"], None)], t["nome"] + " em Blumenau", d["h1"], d["lead"])
+    h = head(d["title"], d["desc"], SITE + "/" + slug + ".html", sch,
+             preload="assets/img/" + img_file, page_img=img_file)
+    h += header(slug, overlay=True, wa_msg=wa_msg)
+    h += thero([("Tratamentos", "tratamentos.html"), (t["nome"], None)],
+               t["nome"] + " em Blumenau", d["h1"], d["lead"],
+               img_file, img_w, img_h, img_alt, wa_msg,
+               cta_label="Agendar " + t["nome"].lower() + " no WhatsApp")
 
+    qcards = symptom_cards(d["queixas"], t["nome"])
     intro = "".join('<p class="reveal mt-5" data-d="' + str(min(i + 1, 3)) + '">' + p + '</p>'
                     for i, p in enumerate(d["intro_p"]))
     bene = "".join('<article class="card reveal" data-d="' + str(i % 4) + '"><span class="ic">' +
@@ -806,100 +919,116 @@ def build_treatment(slug):
     others = "".join(
         '<article class="card tcard reveal" data-d="' + str(i % 4) + '"><span class="ic">' + IC[o["icon"]] +
         '</span><h3>' + o["nome"] + '</h3><p>' + o["curto"] + '</p>'
-        '<a class="tlink" href="' + o["slug"] + '.html">Ver mais @@ICARR@@</a></article>'
+        '<a class="tlink" href="' + o["slug"] + '.html">Conhecer ' + o["nome"].lower() + ' @@ICARR@@</a></article>'
         for i, o in enumerate([x for x in TREATMENTS if x["slug"] != slug]))
 
     h += """
 <main id="main">
 
+<!-- ===== 1. TRIAGEM RÁPIDA DIRETO PARA O WHATSAPP ===== -->
+<section class="section section--tight section--soft" id="queixas">
+  <div class="container">
+    <div class="sec-head sec-head--center">
+      <span class="eyebrow eyebrow--center reveal">Atendimento rápido pelo WhatsApp</span>
+      <h2 class="reveal" data-d="1">Qual é a sua principal queixa hoje?</h2>
+      <p class="reveal" data-d="2">Toque na opção abaixo para iniciar a conversa no WhatsApp já com o seu caso preenchido. Nossa equipe orienta você na hora.</p>
+    </div>
+    @@QCARDS@@
+  </div>
+</section>
+
+<!-- ===== 2. COMO FUNCIONA + O QUE ENTREGA NA 1ª CONSULTA ===== -->
 <section class="section">
   <div class="container">
-    <div class="split">
+    <div class="split split--top">
       <div>
         <span class="eyebrow reveal">Sobre o tratamento</span>
         <h2 class="reveal mt-5" data-d="1">@@IH@@</h2>
         @@INTRO@@
-        <div class="btn-row reveal mt-6" data-d="3">
-          <a class="btn btn--primary" href="@@WAT@@" target="_blank" rel="noopener">@@ICWA@@ Agendar avaliação</a>
-          <a class="btn btn--ghost" href="metodo.html">Como avaliamos</a>
-        </div>
+        <h3 class="reveal mt-8" data-d="2">Principais indicações atendidas</h3>
+        <ul class="checks reveal mt-5" data-d="2">@@PARA@@</ul>
       </div>
-      <div class="reveal" data-d="1">
-        <div class="arch arch--media"><img src="assets/img/@@TIMG@@" alt="@@TIMGALT@@" width="@@TIMGW@@" height="@@TIMGH@@" loading="lazy"></div>
+      <div class="eval-card sticky-col reveal" data-d="1">
+        <span class="eyebrow">Sua 1ª sessão aqui</span>
+        <h3>O que acontece na avaliação inicial</h3>
+        <p>Nada de pacote pronto antes de examinar você. Na primeira consulta entregamos clareza sobre o seu quadro:</p>
+        <ol class="eval-steps">
+          <li><span class="eval-steps__n">1</span><div><b>Escuta clínica</b><span>Entendemos sua rotina, histórico, exames prévios e o que agrava ou alivia a queixa.</span></div></li>
+          <li><span class="eval-steps__n">2</span><div><b>Testes funcionais de movimento</b><span>Avaliamos mobilidade, força e a causa biomecânica real da sobrecarga.</span></div></li>
+          <li><span class="eval-steps__n">3</span><div><b>Conduta e plano transparente</b><span>Explicamos o diagnóstico funcional, iniciamos o cuidado indicado e alinhamos os próximos passos.</span></div></li>
+        </ol>
+        <a class="btn btn--wa btn--lg" href="@@WAT@@" target="_blank" rel="noopener" style="width:100%">@@ICWA@@ Agendar minha avaliação</a>
+        <div class="eval-card__meta">
+          <span>@@ICCHK@@ Sem pedido médico</span>
+          <span>@@ICCHK@@ Recibo p/ reembolso</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ===== 3. BENEFÍCIOS ===== -->
 <section class="section section--soft">
   <div class="container">
     <div class="sec-head sec-head--center">
-      <span class="eyebrow eyebrow--center reveal">Benefícios</span>
-      <h2 class="reveal" data-d="1">O que você ganha com @@TNOMEL@@</h2>
+      <span class="eyebrow eyebrow--center reveal">Diferenciais clínicos</span>
+      <h2 class="reveal" data-d="1">O que você ganha com @@TNOMEL@@ no Instituto Correr</h2>
     </div>
     <div class="grid grid-4 mt-8">@@BENE@@</div>
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="split">
-      <div>
-        <span class="eyebrow reveal">Indicações</span>
-        <h2 class="reveal mt-5" data-d="1">Para quem é indicado</h2>
-        <p class="lead reveal mt-5" data-d="2">Esta lista é um ponto de partida. A indicação definitiva sai da avaliação e, se o seu caso pedir outra abordagem, a gente diz.</p>
-        <div class="btn-row reveal mt-6" data-d="3"><a class="btn btn--dark" href="@@WAT@@" target="_blank" rel="noopener">@@ICWA@@ Tirar dúvida sobre o meu caso</a></div>
-      </div>
-      <ul class="checks reveal" data-d="1">@@PARA@@</ul>
-    </div>
-  </div>
-</section>
+<!-- ===== 4. PRÉ-AGENDAMENTO RÁPIDO + EQUIPE LOCAL ===== -->
+@@FASTSRV@@
 
-<section class="section section--dark">
-  <div class="container">
-    <div class="sec-head">
-      <span class="eyebrow reveal">Como funciona aqui</span>
-      <h2 class="reveal" data-d="1">Três coisas acontecem antes da primeira técnica</h2>
-    </div>
-    <div class="grid grid-3 mt-8">
-      <div class="pillar reveal"><div class="pillar__n">01</div><h3>Anamnese</h3><p>Sua história, sua rotina, o que piora e o que já foi tentado. É metade do diagnóstico.</p></div>
-      <div class="pillar reveal" data-d="1"><div class="pillar__n">02</div><h3>Exame funcional</h3><p>Testes de mobilidade, força e controle para achar a origem, não só o ponto que dói.</p></div>
-      <div class="pillar reveal" data-d="2"><div class="pillar__n">03</div><h3>Plano aprovado por você</h3><p>Técnicas, frequência e prazo definidos e explicados antes de começar.</p></div>
-    </div>
-  </div>
-</section>
-
+<!-- ===== 5. CONHEÇA A ESTRUTURA EM VÍDEO ===== -->
 <section class="section">
   <div class="container container--narrow">
     <div class="sec-head sec-head--center">
-      <span class="eyebrow eyebrow--center reveal">Dúvidas frequentes</span>
-      <h2 class="reveal" data-d="1">Sobre @@TNOMEL@@</h2>
+      <span class="eyebrow eyebrow--center reveal">Estrutura em Blumenau</span>
+      <h2 class="reveal" data-d="1">Veja onde você será atendido</h2>
+      <p class="reveal" data-d="2">Consultórios equipados e estúdio completo na Rua Frederico Busch Júnior, 101.</p>
     </div>
-    <div class="reveal mt-8">@@FAQ@@</div>
+    <div class="mt-8">@@VIDEO@@</div>
   </div>
 </section>
 
+<!-- ===== 6. FAQ DO TRATAMENTO ===== -->
 <section class="section section--soft">
+  <div class="container container--narrow">
+    <div class="sec-head sec-head--center">
+      <span class="eyebrow eyebrow--center reveal">Dúvidas frequentes</span>
+      <h2 class="reveal" data-d="1">Perguntas comuns sobre @@TNOMEL@@</h2>
+    </div>
+    <div class="reveal mt-8">@@FAQ@@</div>
+    <div class="center reveal mt-8">
+      <a class="btn btn--wa" href="@@WAT@@" target="_blank" rel="noopener">@@ICWA@@ Tirar outra dúvida no WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7. OUTROS TRATAMENTOS ===== -->
+<section class="section">
   <div class="container">
     <div class="sec-head sec-head--center">
-      <span class="eyebrow eyebrow--center reveal">Outros tratamentos</span>
-      <h2 class="reveal" data-d="1">Frequentemente combinados com este</h2>
+      <span class="eyebrow eyebrow--center reveal">Cuidado integrado</span>
+      <h2 class="reveal" data-d="1">Abordagens frequentemente combinadas</h2>
     </div>
     <div class="grid grid-4 mt-8">@@OTHERS@@</div>
   </div>
 </section>
 
 </main>
-""".replace("@@IH@@", d["intro_h"]).replace("@@INTRO@@", intro).replace("@@BENE@@", bene)\
-   .replace("@@PARA@@", para).replace("@@OTHERS@@", others)\
-   .replace("@@TIMG@@", img_file).replace("@@TIMGALT@@", img_alt)\
-   .replace("@@TIMGW@@", str(img_w)).replace("@@TIMGH@@", str(img_h))\
+""".replace("@@QCARDS@@", qcards).replace("@@IH@@", d["intro_h"]).replace("@@INTRO@@", intro)\
+   .replace("@@BENE@@", bene).replace("@@PARA@@", para).replace("@@OTHERS@@", others)\
+   .replace("@@FASTSRV@@", fast_schedule_section(t["nome"], "section section--sand"))\
    .replace("@@TNOME@@", t["nome"]).replace("@@TNOMEL@@", t["nome"].lower())\
-   .replace("@@WAT@@", wa_link("Olá! Gostaria de agendar uma avaliação para " + t["nome"] + " no Instituto Correr."))
+   .replace("@@WAT@@", wa_link(wa_msg))
 
-    h += cta_band("Comece pela avaliação, é ela que define tudo",
-                  "Conte o que você está sentindo. Em uma sessão você entende a causa do problema e sai com um plano de tratamento definido.")
-    h += footer()
+    h += cta_band("Pronto para cuidar disso pelo caminho certo?",
+                  "Chame nossa equipe no WhatsApp, conte o que está sentindo e veja os horários disponíveis ainda para esta semana em Blumenau.",
+                  wa_msg=wa_msg)
+    h += footer(wa_msg=wa_msg, wa_bar_label="Agendar " + t["nome"].lower())
     return _fill(h, faq=acc(d["faq"]))
 
 
@@ -914,7 +1043,7 @@ def build_contato():
     h += header("contato.html")
     h += phero([("Contato", None)], "Fale com a gente",
                "Agende sua avaliação",
-               "Responda três campos e a gente já abre a conversa no WhatsApp com tudo preenchido, ou ligue direto, se preferir.")
+               "Responda os campos abaixo e a gente já abre a conversa no WhatsApp com tudo preenchido, ou chame direto no botão, se preferir.")
     opts = "".join('<option value="' + t["nome"] + '">' + t["nome"] + '</option>' for t in TREATMENTS)
     h += """
 <main id="main">
@@ -925,9 +1054,9 @@ def build_contato():
         <span class="eyebrow reveal">Canais diretos</span>
         <h2 class="reveal mt-5" data-d="1">Onde nos encontrar</h2>
         <div class="grid mt-6" style="gap:1rem">
-          <div class="infocard reveal" data-d="1"><span class="ic">@@ICWA@@</span><div><h3>WhatsApp</h3><a href="@@WA@@" target="_blank" rel="noopener">@@PH@@, abrir conversa</a></div></div>
+          <div class="infocard reveal" data-d="1"><span class="ic">@@ICWA@@</span><div><h3>WhatsApp (resposta rápida)</h3><a href="@@WA@@" target="_blank" rel="noopener">@@PH@@ · Abrir conversa agora</a></div></div>
           <div class="infocard reveal" data-d="2"><span class="ic">@@ICPH@@</span><div><h3>Telefone</h3><a href="tel:@@TEL@@">@@PH@@</a></div></div>
-          <div class="infocard reveal" data-d="3"><span class="ic">@@ICMAIL@@</span><div><h3>E-mail</h3><a href="mailto:@@EMAIL@@">@@EMAIL@@</a></div></div>
+          <div class="infocard reveal" data-d="3"><span class="ic">@@ICMAIL@@</span><div><h3>E-mail</h3>@@EML@@</div></div>
           <div class="infocard reveal" data-d="3"><span class="ic">@@ICMAP@@</span><div><h3>Endereço</h3><p>@@STREET@@<br>@@CITY@@/@@STATE@@, CEP @@CEP@@</p></div></div>
           <div class="infocard reveal" data-d="3"><span class="ic">@@ICCLK@@</span><div><h3>Horário de atendimento</h3><p>@@HOURS@@<br>Sábados, domingos e feriados: fechado</p></div></div>
         </div>
@@ -935,7 +1064,7 @@ def build_contato():
       <div class="form-panel reveal" data-d="1">
         <h2 style="font-size:clamp(1.5rem,2.4vw,1.9rem)">Solicitar agendamento</h2>
         <p class="mt-5" style="font-size:.97rem">Preencha e clique em enviar: a conversa abre no WhatsApp com a sua mensagem pronta.</p>
-        <form class="form mt-6" data-wa-form="@@WANUM@@">
+        <form class="form mt-6" data-wa-form="@@WANUM@@" data-form-name="contato_completo">
           <div class="field"><label for="nome">Nome completo <span class="req">*</span></label>
             <input id="nome" name="nome" type="text" required placeholder="Como podemos te chamar?" autocomplete="name"></div>
           <div class="field"><label for="telefone">Telefone / WhatsApp <span class="req">*</span></label>
@@ -945,9 +1074,17 @@ def build_contato():
               <option value="Ainda não sei, quero uma avaliação">Ainda não sei, quero uma avaliação</option>
               @@OPTS@@
             </select></div>
+          <fieldset class="field shift-group">
+            <legend>Melhor período para atendimento</legend>
+            <div class="shift-pills">
+              <label class="shift-pill"><input type="radio" name="periodo" value="Manhã (7h às 12h)" checked><span>Manhã (7h-12h)</span></label>
+              <label class="shift-pill"><input type="radio" name="periodo" value="Tarde (13h às 17h)"><span>Tarde (13h-17h)</span></label>
+              <label class="shift-pill"><input type="radio" name="periodo" value="Fim do dia (17h às 20h)"><span>Noite (17h-20h)</span></label>
+            </div>
+          </fieldset>
           <div class="field"><label for="mensagem">O que você está sentindo?</label>
             <textarea id="mensagem" name="mensagem" placeholder="Ex.: dor lombar há 3 meses, piora quando fico sentado..."></textarea></div>
-          <button class="btn btn--primary btn--lg" type="submit">@@ICWA@@ Enviar pelo WhatsApp</button>
+          <button class="btn btn--wa btn--lg" type="submit">@@ICWA@@ Enviar pelo WhatsApp</button>
           <p class="form__note">Ao enviar, você será direcionado ao WhatsApp do Instituto Correr com a mensagem preenchida. Seus dados não são armazenados neste site.</p>
         </form>
       </div>
@@ -975,7 +1112,7 @@ def build_contato():
 def build_404():
     h = head("Página não encontrada | Instituto Correr", "A página que você procura não existe ou foi movida.",
              SITE + "/404.html")
-    h = h.replace('<meta name="robots" content="index, follow, max-image-preview:large">',
+    h = h.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">',
                   '<meta name="robots" content="noindex, follow">')
     h += header()
     h += """
@@ -986,8 +1123,8 @@ def build_404():
     <h1 class="mt-5">Essa página saiu do lugar</h1>
     <p class="lead mt-5">O endereço que você acessou não existe ou foi movido. Mas a gente pode te levar de volta ao caminho certo.</p>
     <div class="btn-row mt-8" style="justify-content:center">
-      <a class="btn btn--primary" href="index.html">Voltar ao início</a>
-      <a class="btn btn--ghost" href="tratamentos.html">Ver tratamentos</a>
+      <a class="btn btn--wa" href="@@WA@@" target="_blank" rel="noopener">@@ICWA@@ Falar no WhatsApp</a>
+      <a class="btn btn--ghost" href="index.html">Voltar ao início</a>
     </div>
   </div>
 </section>
@@ -1003,7 +1140,8 @@ def build_404():
 def build_aux():
     pages = ["", "sobre.html", "metodo.html", "equipe.html", "tratamentos.html", "contato.html"] + \
             [t["slug"] + ".html" for t in TREATMENTS]
-    prio = {"": "1.0", "tratamentos.html": "0.9", "contato.html": "0.9"}
+    prio = {"": "1.0", "tratamentos.html": "0.9", "contato.html": "0.9",
+            "fisioterapia.html": "0.9", "quiropraxia.html": "0.9", "pilates.html": "0.9"}
     today = S.BUILD_DATE
     urls = ""
     for p in pages:
@@ -1014,14 +1152,9 @@ def build_aux():
     sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n')
     write("sitemap.xml", sm)
-    # O deploy publica a raiz do repositorio (vercel.json -> outputDirectory "."),
-    # entao o gerador e os arquivos de apoio ficam alcancaveis pelo dominio.
-    # Nao ha segredo neles, mas tambem nao devem ser indexados.
     blocked = ["/build/", "/tools/", "/AGENTS.md", "/COMECE-AQUI.md", "/LEIA-ME.md", "/package.json"]
     robots = ["# Instituto Correr: fisioterapia, quiropraxia e pilates em Blumenau/SC",
               "# Resumo para assistentes de IA: " + SITE + "/llms.txt", ""]
-    # Buscadores e assistentes de IA liberados de forma explicita. Ser citado
-    # pelo ChatGPT, Perplexity, Gemini e Claude depende de eles poderem ler o site.
     ai_bots = ["Googlebot", "Bingbot", "OAI-SearchBot", "ChatGPT-User", "GPTBot",
                "PerplexityBot", "Perplexity-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
                "Google-Extended", "Applebot", "Applebot-Extended", "meta-externalagent", "DuckAssistBot"]
@@ -1046,9 +1179,6 @@ def build_aux():
     print("  ✓ assets/img/favicon.svg")
 
 
-# ==========================================================================
-# llms.txt: resumo em Markdown para ChatGPT, Perplexity, Claude e afins
-# ==========================================================================
 def _txt(html):
     import re
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html)).strip()
@@ -1104,9 +1234,8 @@ def build_llms():
     return "\n".join(L)
 
 
-# ==========================================================================
 if __name__ == "__main__":
-    print("Gerando site do Instituto Correr…\n")
+    print("Gerando site do Instituto Correr...\n")
     write("index.html", build_home())
     write("sobre.html", build_sobre())
     write("metodo.html", build_metodo())

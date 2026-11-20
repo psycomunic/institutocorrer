@@ -1,6 +1,74 @@
-/* Instituto Correr: interações */
+/* Instituto Correr: interações e medição de conversões */
 (function () {
   'use strict';
+
+  var IS_PROD = /(^|\.)institutocorrerblumenau\.com$/i.test(location.hostname);
+
+  /* Captura e persiste a origem do acesso (Google Ads, Meta, orgânico) na sessão
+     para identificar no WhatsApp de onde veio o paciente mesmo que ele navegue
+     entre páginas antes de clicar para conversar. */
+  var ATTR_KEY = 'ic_lead_attr';
+  function captureAttribution() {
+    try {
+      var sp = new URLSearchParams(location.search);
+      var hasClickId = sp.get('gclid') || sp.get('gbraid') || sp.get('wbraid') || sp.get('fbclid');
+      var utmSrc = sp.get('utm_source') || '';
+      var existing = sessionStorage.getItem(ATTR_KEY);
+      if (hasClickId || utmSrc) {
+        var data = {
+          source: (sp.get('gclid') || sp.get('gbraid') || sp.get('wbraid')) ? 'google_ads'
+            : sp.get('fbclid') ? 'meta_ads'
+            : utmSrc.toLowerCase(),
+          campaign: sp.get('utm_campaign') || '',
+          term: sp.get('utm_term') || '',
+          landing: location.pathname
+        };
+        sessionStorage.setItem(ATTR_KEY, JSON.stringify(data));
+        return data;
+      }
+      if (existing) return JSON.parse(existing);
+      if (document.referrer) {
+        var ref = document.referrer.toLowerCase();
+        var rSrc = '';
+        if (ref.indexOf('google.') !== -1) rSrc = 'google_organico';
+        else if (ref.indexOf('instagram.') !== -1 || ref.indexOf('facebook.') !== -1) rSrc = 'instagram_facebook';
+        else if (ref.indexOf('bing.') !== -1) rSrc = 'bing';
+        if (rSrc) {
+          var rData = { source: rSrc, campaign: '', term: '', landing: location.pathname };
+          sessionStorage.setItem(ATTR_KEY, JSON.stringify(rData));
+          return rData;
+        }
+      }
+    } catch (err) { /* sessionStorage bloqueado não afeta navegação */ }
+    return null;
+  }
+
+  var leadAttr = captureAttribution();
+
+  function originLabel() {
+    if (!leadAttr || !leadAttr.source) return '';
+    var s = leadAttr.source;
+    if (s === 'google_ads' || s === 'google' || s === 'cpc' || s === 'adwords') return 'Google';
+    if (s === 'google_organico') return 'Pesquisa Google';
+    if (s === 'meta_ads' || s === 'instagram' || s === 'facebook' || s === 'ig' || s === 'fb') return 'Instagram/Facebook';
+    if (s === 'instagram_facebook') return 'Instagram';
+    return '';
+  }
+
+  function enrichWaHref(href) {
+    try {
+      var u = new URL(href);
+      if (u.hostname !== 'wa.me') return href;
+      var txt = u.searchParams.get('text') || 'Olá! Gostaria de agendar uma avaliação no Instituto Correr.';
+      var lbl = originLabel();
+      if (lbl && txt.indexOf('(Vim pel') === -1 && txt.indexOf('Origem:') === -1) {
+        txt = txt + '\n(Vim pelo ' + lbl + ')';
+        u.searchParams.set('text', txt);
+        return u.toString();
+      }
+    } catch (err) { /* mantém href original */ }
+    return href;
+  }
 
   /* Header shrink on scroll */
   var header = document.querySelector('.header');
@@ -67,6 +135,21 @@
     }
   });
 
+  /* Esconde a barra fixa mobile enquanto o teclado virtual está aberto em campos */
+  document.addEventListener('focusin', function (e) {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+      document.body.classList.add('kb-open');
+    }
+  });
+  document.addEventListener('focusout', function () {
+    setTimeout(function () {
+      var act = document.activeElement;
+      if (!act || !/^(INPUT|TEXTAREA|SELECT)$/.test(act.tagName)) {
+        document.body.classList.remove('kb-open');
+      }
+    }, 120);
+  });
+
   /* Accordion */
   document.querySelectorAll('.acc').forEach(function (acc) {
     acc.querySelectorAll('.acc__btn').forEach(function (btn) {
@@ -96,7 +179,7 @@
         entries.forEach(function (en) {
           if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
         });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
       reveals.forEach(function (el) { io.observe(el); });
     } else {
       reveals.forEach(function (el) { el.classList.add('is-in'); });
@@ -124,8 +207,7 @@
     counters.forEach(function (el) { cio.observe(el); });
   }
 
-  /* Vídeo: o iframe do YouTube só nasce no clique.
-     Antes disso a página não fala com o YouTube nem carrega os cookies dele. */
+  /* Vídeo: o iframe do YouTube só nasce no clique. */
   document.querySelectorAll('[data-video]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var f = document.createElement('iframe');
@@ -141,17 +223,19 @@
   });
 
   /* Medição de conversões
-     Empurra eventos no dataLayer (GTM) e, se existirem, chama gtag (GA4/Ads)
-     e fbq (Meta Pixel). Sem nenhuma tag configurada, não faz nada. */
+     Empurra eventos no dataLayer (GTM) e, se existirem em produção, chama gtag (GA4/Ads)
+     e fbq (Meta Pixel). Ambientes de homologação (.vercel.app / localhost) não disparam
+     conversões na conta oficial do Google Ads. */
   function track(name, params) {
     params = params || {};
     params.page_path = location.pathname;
+    if (leadAttr && leadAttr.source) params.traffic_origin = leadAttr.source;
     var phone = params.user_phone;
-    delete params.user_phone; // dado pessoal: só vai para o Google Ads (hash automático)
+    delete params.user_phone;
     try {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push(Object.assign({ event: name }, params));
-      if (typeof window.gtag === 'function') {
+      if (IS_PROD && typeof window.gtag === 'function') {
         window.gtag('event', name, params);
         var conv = window.__adsConv && window.__adsConv[name];
         if (conv) {
@@ -161,7 +245,7 @@
           });
         }
       }
-      if (typeof window.fbq === 'function') {
+      if (IS_PROD && typeof window.fbq === 'function') {
         window.fbq('track', name === 'generate_lead' ? 'Lead' : 'Contact', params);
       }
     } catch (err) { /* medição nunca pode quebrar o clique */ }
@@ -171,39 +255,62 @@
     var a = e.target.closest && e.target.closest('a[href]');
     if (!a) return;
     var href = a.getAttribute('href');
-    var where = a.closest('header, .mnav') ? 'header'
+    var where = a.dataset.trackLoc ? a.dataset.trackLoc
+      : a.closest('.header__mcta') ? 'header_mobile'
+      : a.closest('header, .mnav') ? 'header'
+      : a.closest('.mbar') ? 'barra_mobile'
       : a.closest('.wa-float') ? 'botao_flutuante'
+      : a.closest('.qgrid, .trust-strip') ? 'triagem_queixa'
       : a.closest('footer') ? 'rodape'
       : a.closest('.cta-band') ? 'cta_final'
-      : a.closest('.hero, .phero') ? 'topo' : 'conteudo';
-    if (/^https:\/\/wa\.me\//.test(href)) track('whatsapp_click', { link_location: where });
-    else if (/^tel:/.test(href)) track('phone_click', { link_location: where });
-    else if (/^mailto:/.test(href)) track('email_click', { link_location: where });
+      : a.closest('.hero, .phero, .thero') ? 'topo' : 'conteudo';
+    if (/^https:\/\/wa\.me\//.test(href)) {
+      a.setAttribute('href', enrichWaHref(href));
+      track('whatsapp_click', { link_location: where });
+    } else if (/^tel:/.test(href)) {
+      track('phone_click', { link_location: where });
+    } else if (/^mailto:/.test(href)) {
+      track('email_click', { link_location: where });
+    }
   });
 
-  /* Form → WhatsApp */
-  var form = document.querySelector('[data-wa-form]');
-  if (form) {
+  /* Form → WhatsApp (suporta múltiplos formulários rápidos nas páginas de serviço, home e contato) */
+  document.querySelectorAll('[data-wa-form]').forEach(function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var digits = String(new FormData(form).get('telefone') || '').replace(/\D/g, '');
+      var f = new FormData(form);
+      var rawPhone = String(f.get('telefone') || '').trim();
+      var digits = rawPhone.replace(/\D/g, '');
       if (digits && digits.indexOf('55') !== 0) digits = '55' + digits;
+      var servico = String(f.get('servico') || 'Avaliação');
+      var periodo = String(f.get('periodo') || '');
+      var queixa = String(f.get('mensagem') || '').trim();
+      var nome = String(f.get('nome') || '').trim();
+
       track('generate_lead', {
-        form_name: 'agendamento',
-        service: String(new FormData(form).get('servico') || ''),
+        form_name: form.dataset.formName || 'agendamento',
+        service: servico,
+        shift: periodo || 'qualquer',
         user_phone: digits.length >= 12 ? '+' + digits : undefined
       });
-      var f = new FormData(form);
-      var msg =
-        'Olá, Instituto Correr! Gostaria de agendar uma avaliação.\n\n' +
-        'Nome: ' + (f.get('nome') || '') + '\n' +
-        'Telefone: ' + (f.get('telefone') || '') + '\n' +
-        'Serviço de interesse: ' + (f.get('servico') || '') + '\n' +
-        'Queixa principal: ' + (f.get('mensagem') || 'não informado');
+
+      var lines = [
+        'Olá, Instituto Correr! Gostaria de agendar uma avaliação.',
+        '',
+        'Nome: ' + (nome || 'não informado')
+      ];
+      if (rawPhone) lines.push('WhatsApp: ' + rawPhone);
+      lines.push('Interesse: ' + servico);
+      if (periodo) lines.push('Melhor período: ' + periodo);
+      lines.push('Queixa principal: ' + (queixa || 'quero explicar na conversa'));
+      var lbl = originLabel();
+      if (lbl) lines.push('(Vim pelo ' + lbl + ')');
+
       var num = form.dataset.waForm;
-      window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+      var url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(lines.join('\n'));
+      window.open(url, '_blank', 'noopener');
     });
-  }
+  });
 
   /* Phone mask (BR) */
   document.querySelectorAll('[data-mask="phone"]').forEach(function (inp) {
